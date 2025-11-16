@@ -1,4 +1,6 @@
+// src/AuthPage.jsx
 import React, { useState } from "react";
+import "./HomePage.css";
 
 export default function AuthPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -6,7 +8,7 @@ export default function AuthPage() {
   const [loginForm, setLoginForm] = useState({
     username: "",
     password: "",
-    mode: "admin", // 'admin' hoặc 'store'
+    mode: "admin",
   });
 
   const [registerStep, setRegisterStep] = useState(1);
@@ -26,9 +28,7 @@ export default function AuthPage() {
     ownerPasswordConfirm: "",
   });
 
-  // ================== HANDLERS ==================
-
-  // Login
+  // ===== Handlers =====
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginForm((prev) => ({ ...prev, [name]: value }));
@@ -36,19 +36,21 @@ export default function AuthPage() {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    // TODO: gọi API đăng nhập
-    console.log("Login data:", loginForm);
     alert(
-      `Đăng nhập với user: ${loginForm.username}\nChế độ: ${
+      `Đăng nhập: ${loginForm.username}\nChế độ: ${
         loginForm.mode === "admin" ? "Trang quản lý" : "Trang bán hàng"
       }`
     );
   };
 
-  // Store
   const handleStoreChange = (e) => {
     const { name, value } = e.target;
     setStoreForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOwnerChange = (e) => {
+    const { name, value } = e.target;
+    setOwnerForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleNextStep = () => {
@@ -57,12 +59,6 @@ export default function AuthPage() {
       return;
     }
     setRegisterStep(2);
-  };
-
-  // Owner
-  const handleOwnerChange = (e) => {
-    const { name, value } = e.target;
-    setOwnerForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePrevStep = () => setRegisterStep(1);
@@ -74,13 +70,8 @@ export default function AuthPage() {
       return;
     }
 
-    // TODO: gọi API đăng ký (gửi storeForm + ownerForm)
-    console.log("Store data:", storeForm);
-    console.log("Owner data:", ownerForm);
+    alert("Đăng ký cửa hàng & tài khoản chủ cửa hàng thành công!");
 
-    alert("Đăng ký cửa hàng và tài khoản chủ cửa hàng thành công!");
-
-    // reset
     setStoreForm({
       storeName: "",
       storeAddress: "",
@@ -97,282 +88,388 @@ export default function AuthPage() {
     setRegisterStep(1);
   };
 
-  // ================== JSX ==================
-
+  // ===== JSX =====
   return (
-    <div className="container-fluid p-0">
-      <div className="row g-0 min-vh-100">
-        {/* Cột trái */}
-        <div
-          className="col-12 col-md-4 d-flex flex-column justify-content-between text-white p-4 p-md-5"
-          style={{
-            background:
-              "linear-gradient(135deg, #22c55e 0%, #0f172a 40%, #020617 100%)",
-          }}
-        >
-          <div>
-            <h1 className="fw-bold display-6 mb-3">Quản lý bán hàng</h1>
-            <p className="small mb-0">
-              Hệ thống giúp bạn quản lý cửa hàng, sản phẩm, đơn hàng và doanh
-              thu một cách dễ dàng và trực quan.
-            </p>
-          </div>
+    <div className="auth-screen">
+      {/* Background blobs */}
+      <div className="auth-bg-layer auth-bg-layer-1" />
+      <div className="auth-bg-layer auth-bg-layer-2" />
 
-          <div className="mt-4">
-            <button
-              className="btn btn-outline-light w-100"
-              onClick={() => setIsLoginOpen(true)}
-            >
-              Đăng nhập
-            </button>
+      {/* HEADER */}
+      <header className="auth-nav">
+        <div className="auth-nav-left">
+          <div className="auth-logo-mark">S</div>
+          <div>
+            <div className="auth-logo-title">StoreSuite</div>
+            <div className="auth-logo-caption">Quản lý bán hàng thông minh</div>
           </div>
         </div>
+        <div className="auth-nav-right">
+          <a href="#features" className="auth-nav-link d-none d-md-inline">
+            Tính năng
+          </a>
+          <a href="#how" className="auth-nav-link d-none d-md-inline">
+            Cách hoạt động
+          </a>
+          <button
+            className="btn btn-outline-success btn-sm"
+            onClick={() => setIsLoginOpen(true)}
+          >
+            Đăng nhập
+          </button>
+        </div>
+      </header>
 
-        {/* Cột phải */}
-        <div className="col-12 col-md-8 bg-dark text-white p-4 p-md-5">
-          <div className="mx-md-4">
-            <h2 className="h3 mb-1">Đăng ký cửa hàng</h2>
-            <p className="text-secondary small mb-3">
-              Bước {registerStep} / 2 –{" "}
-              {registerStep === 1
-                ? "Thông tin cửa hàng"
-                : "Thông tin chủ cửa hàng"}
-            </p>
+      {/* MAIN CONTENT */}
+      <main className="auth-main">
+        <div className="container-xl">
+          <div className="row gx-5 gy-4 align-items-center">
+            {/* HERO LEFT */}
+            <div className="col-lg-5 order-2 order-lg-1">
+              <section className="auth-hero">
+                <span className="auth-badge">Phiên bản dành cho chủ cửa hàng</span>
+                <h1 className="auth-hero-title">
+                  Một nơi duy nhất để <span>quản lý mọi điểm bán</span>.
+                </h1>
+                <p className="auth-hero-sub">
+                  Kết nối sản phẩm, đơn hàng, tồn kho, nhân viên và doanh thu
+                  trong một nền tảng trực quan – giúp bạn ra quyết định nhanh
+                  hơn, chính xác hơn.
+                </p>
 
-            {/* Stepper */}
-            <div className="d-flex align-items-center mb-4">
-              <div className="d-flex align-items-center me-4">
-                <span
-                  className={
-                    "badge rounded-pill me-2 " +
-                    (registerStep >= 1 ? "bg-success" : "bg-secondary")
-                  }
-                >
-                  1
-                </span>
-                <span className="small">Cửa hàng</span>
-              </div>
-              <div className="d-flex align-items-center">
-                <span
-                  className={
-                    "badge rounded-pill me-2 " +
-                    (registerStep >= 2 ? "bg-success" : "bg-secondary")
-                  }
-                >
-                  2
-                </span>
-                <span className="small">Chủ cửa hàng</span>
-              </div>
+                <div className="row g-3 auth-feature-row">
+                  <div className="col-12">
+                    <div className="auth-feature-card">
+                      <div className="auth-feature-icon">📦</div>
+                      <div>
+                        <div className="auth-feature-title">
+                          Quản lý tồn kho thông minh
+                        </div>
+                        <div className="auth-feature-desc">
+                          Cảnh báo hết hàng, tồn âm, đề xuất nhập hàng theo tốc
+                          độ bán.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6">
+                    <div className="auth-feature-card small">
+                      <div className="auth-feature-icon">🏬</div>
+                      <div>
+                        <div className="auth-feature-title">Nhiều cửa hàng</div>
+                        <div className="auth-feature-desc">
+                          Gom doanh thu từ tất cả chi nhánh vào một báo cáo.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6">
+                    <div className="auth-feature-card small">
+                      <div className="auth-feature-icon">📈</div>
+                      <div>
+                        <div className="auth-feature-title">
+                          Báo cáo theo thời gian thực
+                        </div>
+                        <div className="auth-feature-desc">
+                          Xem doanh thu, lợi nhuận, top sản phẩm mọi lúc.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="auth-mini-stats mt-3">
+                  <div className="auth-mini-stat">
+                    <div className="auth-mini-label">Thời gian triển khai</div>
+                    <div className="auth-mini-value">Trong ngày</div>
+                  </div>
+                  <div className="auth-mini-stat">
+                    <div className="auth-mini-label">Hỗ trợ</div>
+                    <div className="auth-mini-value">7 ngày / tuần</div>
+                  </div>
+                </div>
+              </section>
             </div>
 
-            {/* FORM ĐĂNG KÝ */}
-            <form
-              onSubmit={
-                registerStep === 2
-                  ? handleRegisterSubmit
-                  : (e) => e.preventDefault()
-              }
-            >
-              {registerStep === 1 && (
-                <>
-                  <div className="mb-3">
-                    <label className="form-label">Tên cửa hàng</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="storeName"
-                      value={storeForm.storeName}
-                      onChange={handleStoreChange}
-                      placeholder="Ví dụ: Cửa hàng ABC"
-                      required
-                    />
+            {/* FORM RIGHT */}
+            <div className="col-lg-7 order-1 order-lg-2">
+              <section className="auth-panel-wrapper">
+                <div className="auth-panel shadow-lg">
+                  <div className="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h2 className="h4 mb-1">Tạo cửa hàng của bạn</h2>
+                      <p className="text-muted small mb-0">
+                        Bước {registerStep} / 2 –{" "}
+                        {registerStep === 1
+                          ? "Nhập thông tin cửa hàng"
+                          : "Thông tin chủ cửa hàng"}
+                      </p>
+                    </div>
+                    <span className="badge rounded-pill bg-light text-muted">
+                      Mất khoảng 1–2 phút
+                    </span>
                   </div>
 
-                  <div className="mb-3">
-                    <label className="form-label">Địa chỉ</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="storeAddress"
-                      value={storeForm.storeAddress}
-                      onChange={handleStoreChange}
-                      placeholder="Số nhà, đường, quận/huyện, tỉnh/thành phố"
-                    />
+                  {/* Stepper */}
+                  <div className="auth-stepper mb-4">
+                    <div className="auth-stepper-track">
+                      <div
+                        className={
+                          "auth-stepper-progress " +
+                          (registerStep === 1 ? "half" : "full")
+                        }
+                      />
+                    </div>
+                    <div className="d-flex justify-content-between mt-2">
+                      <div className="text-center">
+                        <div
+                          className={
+                            "auth-step-dot " +
+                            (registerStep >= 1 ? "active" : "")
+                          }
+                        >
+                          1
+                        </div>
+                        <div className="small mt-1">Cửa hàng</div>
+                      </div>
+                      <div className="text-center">
+                        <div
+                          className={
+                            "auth-step-dot " +
+                            (registerStep >= 2 ? "active" : "")
+                          }
+                        >
+                          2
+                        </div>
+                        <div className="small mt-1">Chủ cửa hàng</div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="mb-3">
-                    <label className="form-label">Số điện thoại</label>
-                    <input
-                      type="tel"
-                      className="form-control"
-                      name="storePhone"
-                      value={storeForm.storePhone}
-                      onChange={handleStoreChange}
-                      placeholder="Ví dụ: 0909 xxx xxx"
-                    />
-                  </div>
+                  {/* FORM */}
+                  <form
+                    onSubmit={
+                      registerStep === 2
+                        ? handleRegisterSubmit
+                        : (e) => e.preventDefault()
+                    }
+                  >
+                    {registerStep === 1 && (
+                      <>
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Tên cửa hàng<span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control auth-input"
+                            name="storeName"
+                            value={storeForm.storeName}
+                            onChange={handleStoreChange}
+                            placeholder="Ví dụ: Cửa hàng Sunrise Mart"
+                            required
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Địa chỉ</label>
+                          <input
+                            type="text"
+                            className="form-control auth-input"
+                            name="storeAddress"
+                            value={storeForm.storeAddress}
+                            onChange={handleStoreChange}
+                            placeholder="Số nhà, đường, quận/huyện, tỉnh/thành phố"
+                          />
+                        </div>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">Số điện thoại</label>
+                            <input
+                              type="tel"
+                              className="form-control auth-input"
+                              name="storePhone"
+                              value={storeForm.storePhone}
+                              onChange={handleStoreChange}
+                              placeholder="Ví dụ: 0909 xxx xxx"
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">Ngành hàng</label>
+                            <select
+                              className="form-select auth-input"
+                              name="storeCategory"
+                              value={storeForm.storeCategory}
+                              onChange={handleStoreChange}
+                            >
+                              <option value="">-- Chọn ngành hàng --</option>
+                              <option value="fashion">Thời trang</option>
+                              <option value="food">Ăn uống</option>
+                              <option value="electronics">Điện tử</option>
+                              <option value="cosmetics">Mỹ phẩm</option>
+                              <option value="other">Khác</option>
+                            </select>
+                          </div>
+                        </div>
 
-                  <div className="mb-4">
-                    <label className="form-label">Ngành hàng</label>
-                    <select
-                      className="form-select"
-                      name="storeCategory"
-                      value={storeForm.storeCategory}
-                      onChange={handleStoreChange}
-                    >
-                      <option value="">-- Chọn ngành hàng --</option>
-                      <option value="fashion">Thời trang</option>
-                      <option value="food">Ăn uống</option>
-                      <option value="electronics">Điện tử</option>
-                      <option value="cosmetics">Mỹ phẩm</option>
-                      <option value="other">Khác</option>
-                    </select>
-                  </div>
+                        <div className="d-flex justify-content-between align-items-center mt-2">
+                          <div className="small text-muted">
+                            Bạn có thể thêm nhiều chi nhánh sau khi tạo xong.
+                          </div>
+                          <button
+                            type="button"
+                            className="btn btn-success px-4"
+                            onClick={handleNextStep}
+                          >
+                            Tiếp tục
+                          </button>
+                        </div>
+                      </>
+                    )}
 
-                  <div className="d-flex justify-content-end">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={handleNextStep}
-                    >
-                      Tiếp tục
-                    </button>
-                  </div>
-                </>
-              )}
+                    {registerStep === 2 && (
+                      <>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">
+                              Họ tên chủ cửa hàng
+                              <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control auth-input"
+                              name="ownerName"
+                              value={ownerForm.ownerName}
+                              onChange={handleOwnerChange}
+                              placeholder="Nguyễn Văn A"
+                              required
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">
+                              Email<span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="email"
+                              className="form-control auth-input"
+                              name="ownerEmail"
+                              value={ownerForm.ownerEmail}
+                              onChange={handleOwnerChange}
+                              placeholder="owner@example.com"
+                              required
+                            />
+                          </div>
+                        </div>
 
-              {registerStep === 2 && (
-                <>
-                  <div className="mb-3">
-                    <label className="form-label">Họ tên chủ cửa hàng</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="ownerName"
-                      value={ownerForm.ownerName}
-                      onChange={handleOwnerChange}
-                      placeholder="Nguyễn Văn A"
-                      required
-                    />
-                  </div>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">
+                              Tên đăng nhập<span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control auth-input"
+                              name="ownerUsername"
+                              value={ownerForm.ownerUsername}
+                              onChange={handleOwnerChange}
+                              placeholder="username"
+                              required
+                            />
+                          </div>
+                          <div className="col-md-3 mb-3">
+                            <label className="form-label">
+                              Mật khẩu<span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="password"
+                              className="form-control auth-input"
+                              name="ownerPassword"
+                              value={ownerForm.ownerPassword}
+                              onChange={handleOwnerChange}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-3 mb-3">
+                            <label className="form-label">
+                              Xác nhận<span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="password"
+                              className="form-control auth-input"
+                              name="ownerPasswordConfirm"
+                              value={ownerForm.ownerPasswordConfirm}
+                              onChange={handleOwnerChange}
+                              required
+                            />
+                          </div>
+                        </div>
 
-                  <div className="mb-3">
-                    <label className="form-label">Email</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      name="ownerEmail"
-                      value={ownerForm.ownerEmail}
-                      onChange={handleOwnerChange}
-                      placeholder="owner@example.com"
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Tên đăng nhập</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="ownerUsername"
-                      value={ownerForm.ownerUsername}
-                      onChange={handleOwnerChange}
-                      placeholder="username"
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Mật khẩu</label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="ownerPassword"
-                      value={ownerForm.ownerPassword}
-                      onChange={handleOwnerChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="form-label">Xác nhận mật khẩu</label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="ownerPasswordConfirm"
-                      value={ownerForm.ownerPasswordConfirm}
-                      onChange={handleOwnerChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="d-flex justify-content-between">
-                    <button
-                      type="button"
-                      className="btn btn-outline-light"
-                      onClick={handlePrevStep}
-                    >
-                      Quay lại
-                    </button>
-                    <button type="submit" className="btn btn-success">
-                      Hoàn tất đăng ký
-                    </button>
-                  </div>
-                </>
-              )}
-            </form>
+                        <div className="d-flex justify-content-between mt-2">
+                          <button
+                            type="button"
+                            className="btn btn-outline-success"
+                            onClick={handlePrevStep}
+                          >
+                            Quay lại
+                          </button>
+                          <button type="submit" className="btn btn-success px-4">
+                            Hoàn tất đăng ký
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </form>
+                </div>
+              </section>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
 
-      {/* POPUP ĐĂNG NHẬP */}
+      {/* LOGIN MODAL */}
       {isLoginOpen && (
         <div
           className="modal fade show d-block"
           tabIndex="-1"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+          style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
           onClick={() => setIsLoginOpen(false)}
         >
           <div
             className="modal-dialog modal-dialog-centered"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-content bg-dark text-white">
-              <div className="modal-header border-secondary">
-                <h5 className="modal-title">Đăng nhập</h5>
+            <div className="modal-content">
+              <div className="modal-header border-0">
+                <h5 className="modal-title">Đăng nhập StoreSuite</h5>
                 <button
                   type="button"
-                  className="btn-close btn-close-white"
+                  className="btn-close"
                   onClick={() => setIsLoginOpen(false)}
                 ></button>
               </div>
-
               <form onSubmit={handleLoginSubmit}>
                 <div className="modal-body">
                   <div className="mb-3">
                     <label className="form-label">Tên đăng nhập</label>
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control auth-input"
                       name="username"
                       value={loginForm.username}
                       onChange={handleLoginChange}
                       required
                     />
                   </div>
-
                   <div className="mb-3">
                     <label className="form-label">Mật khẩu</label>
                     <input
                       type="password"
-                      className="form-control"
+                      className="form-control auth-input"
                       name="password"
                       value={loginForm.password}
                       onChange={handleLoginChange}
                       required
                     />
                   </div>
-
                   <div className="mb-2">
                     <label className="form-label">Đăng nhập vào:</label>
                     <div>
@@ -380,8 +477,8 @@ export default function AuthPage() {
                         <input
                           className="form-check-input"
                           type="radio"
-                          name="mode"
                           id="modeAdmin"
+                          name="mode"
                           value="admin"
                           checked={loginForm.mode === "admin"}
                           onChange={handleLoginChange}
@@ -397,8 +494,8 @@ export default function AuthPage() {
                         <input
                           className="form-check-input"
                           type="radio"
-                          name="mode"
                           id="modeStore"
+                          name="mode"
                           value="store"
                           checked={loginForm.mode === "store"}
                           onChange={handleLoginChange}
@@ -414,15 +511,15 @@ export default function AuthPage() {
                   </div>
                 </div>
 
-                <div className="modal-footer border-secondary">
+                <div className="modal-footer border-0">
                   <button
                     type="button"
-                    className="btn btn-outline-light"
+                    className="btn btn-outline-secondary"
                     onClick={() => setIsLoginOpen(false)}
                   >
                     Đóng
                   </button>
-                  <button type="submit" className="btn btn-success">
+                  <button type="submit" className="btn btn-success px-4">
                     Đăng nhập
                   </button>
                 </div>
