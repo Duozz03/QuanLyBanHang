@@ -26,7 +26,7 @@
 .auth-bg-layer {
   position: absolute;
   border-radius: 999px;
-  filter: blur(45px);
+  filter: blur(45px) ;
   opacity: 0.8;
   z-index: 0;
 }
@@ -43,15 +43,16 @@
   width: 320px;
   height: 320px;
   background: rgba(56, 189, 248, 0.5); /* sky */
-  bottom: -120px;
+  top: 500px;
   right: -80px;
 }
+
 
 /* ================== HEADER ================== */
 .auth-nav {
   position: relative;
   z-index: 5;
-  height: 64px;
+  height: 100px;
   padding: 0 32px;
   display: flex;
   align-items: center;
@@ -292,6 +293,8 @@
 }
 
 /* ================== BUTTONS (dùng btn-success cho tiện) ================== */
+
+
 .btn-success {
   background-color: var(--primary);
   border-color: var(--primary);
