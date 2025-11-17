@@ -1,25 +1,34 @@
 // src/AuthPage.jsx
 import React, { useState } from "react";
 import "./HomePage.css";
+import vnProvinces from "./data/vn-provinces.json";
 
 export default function AuthPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
+  
+  //Form đăng nhập 
   const [loginForm, setLoginForm] = useState({
     username: "",
     password: "",
     mode: "admin",
   });
 
+  // Kiểm tra ràng buộc giá trị input, nếu thõa mãn hết thì chuyển qua from đăng kí user
   const [registerStep, setRegisterStep] = useState(1);
 
+  //Form cửa hàng
   const [storeForm, setStoreForm] = useState({
     storeName: "",
     storeAddress: "",
     storePhone: "",
     storeCategory: "",
+   province: "", // tên tỉnh/thành
+  district: "", // tên quận/huyện
+  ward: "",     // tên phường/xã (nếu muốn dùng)
   });
 
+  //Tạo User Admin
   const [ownerForm, setOwnerForm] = useState({
     ownerName: "",
     ownerEmail: "",
@@ -28,12 +37,25 @@ export default function AuthPage() {
     ownerPasswordConfirm: "",
   });
 
+  //Mới thêm
+const provinces = vnProvinces; // import từ JSON
+
+const districts =
+  provinces.find((p) => p.name === storeForm.province)?.districts || [];
+
+const wards =
+  districts.find((d) => d.name === storeForm.district)?.wards || [];
+  //
+
+
   // ===== Handlers =====
+  // Lấy giá trị từ login form đổ vào 
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Thông tin hiển thị sau khi submit
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     alert(
@@ -43,24 +65,51 @@ export default function AuthPage() {
     );
   };
 
+  // Lấy giá trị từ Form Business đổ vào
   const handleStoreChange = (e) => {
     const { name, value } = e.target;
+    if (name === "storePhone") {
+    const onlyDigits = value.replace(/\D/g, "").slice(0, 10); // <-- cắt 10 số // bỏ hết ký tự không phải số
+    setStoreForm(prev => ({
+      ...prev,
+      storePhone: onlyDigits,
+    }));
+    return;
+  }
     setStoreForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  //Lấy thông tin từ Form User đổ vào
   const handleOwnerChange = (e) => {
     const { name, value } = e.target;
-    setOwnerForm((prev) => ({ ...prev, [name]: value }));
+    setOwnerForm((prev) => ({
+       ...prev,
+        [name]: value,
+// đổi tỉnh -> reset quận, phường
+    ...(name === "province" ? { district: "", ward: "" } : {}),
+    // đổi quận -> reset phường
+    ...(name === "district" ? { ward: "" } : {}),
+      }));
   };
 
+  //Kiểm tra hợp lệ để chuyển sang form đăng kí user
   const handleNextStep = () => {
     if (!storeForm.storeName.trim()) {
       alert("Vui lòng nhập tên cửa hàng.");
       return;
     }
+    if (!storeForm.storeAddress.trim()) {
+      alert("Vui lòng nhập địa chỉ cửa hàng.");
+      return;
+    }
+    if (!storeForm.storePhone.trim()) {
+      alert("Vui lòng nhập số điện thoại liên hệ cửa hàng.");
+      return;
+    }
     setRegisterStep(2);
   };
 
+  
   const handlePrevStep = () => setRegisterStep(1);
 
   const handleRegisterSubmit = (e) => {
@@ -70,7 +119,19 @@ export default function AuthPage() {
       return;
     }
 
-    alert("Đăng ký cửa hàng & tài khoản chủ cửa hàng thành công!");
+  
+
+    alert(`Tên cửa hàng: ${storeForm.storeName}
+    Địa chỉ: ${storeForm.storeAddress}, ${storeForm.ward}, ${storeForm.district}, ${storeForm.province}
+    SĐT: ${storeForm.storePhone}
+    Tên Admin: ${ownerForm.ownerName}
+    Email: ${ownerForm.ownerEmail}
+    Tài khoản: ${ownerForm.ownerUsername}
+    Mật khẩu: ${ownerForm.ownerPassword}
+    `
+    
+  
+  );
 
     setStoreForm({
       storeName: "",
@@ -100,7 +161,7 @@ export default function AuthPage() {
         <div className="auth-nav-left">
           <div className="auth-logo-mark">S</div>
           <div>
-            <div className="auth-logo-title">StoreSuite</div>
+            <div className="auth-logo-title">Dauoz</div>
             <div className="auth-logo-caption">Quản lý bán hàng thông minh</div>
           </div>
         </div>
@@ -129,7 +190,7 @@ export default function AuthPage() {
               <section className="auth-hero">
                 <span className="auth-badge">Phiên bản dành cho chủ cửa hàng</span>
                 <h1 className="auth-hero-title">
-                  Một nơi duy nhất để <span>quản lý mọi điểm bán</span>.
+                  Một nơi duy nhất để <span>quản lý cửa hàng của bạn</span>.
                 </h1>
                 <p className="auth-hero-sub">
                   Kết nối sản phẩm, đơn hàng, tồn kho, nhân viên và doanh thu
@@ -156,9 +217,9 @@ export default function AuthPage() {
                     <div className="auth-feature-card small">
                       <div className="auth-feature-icon">🏬</div>
                       <div>
-                        <div className="auth-feature-title">Nhiều cửa hàng</div>
+                        <div className="auth-feature-title">Bán hàng dễ dàng</div>
                         <div className="auth-feature-desc">
-                          Gom doanh thu từ tất cả chi nhánh vào một báo cáo.
+                          Thanh toán nhanh gọn, dễ tiếp cận, dễ sử dụng.
                         </div>
                       </div>
                     </div>
@@ -255,76 +316,125 @@ export default function AuthPage() {
                     }
                   >
                     {registerStep === 1 && (
-                      <>
-                        <div className="mb-3">
-                          <label className="form-label">
-                            Tên cửa hàng<span className="text-danger">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control auth-input"
-                            name="storeName"
-                            value={storeForm.storeName}
-                            onChange={handleStoreChange}
-                            placeholder="Ví dụ: Cửa hàng Sunrise Mart"
-                            required
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label">Địa chỉ</label>
-                          <input
-                            type="text"
-                            className="form-control auth-input"
-                            name="storeAddress"
-                            value={storeForm.storeAddress}
-                            onChange={handleStoreChange}
-                            placeholder="Số nhà, đường, quận/huyện, tỉnh/thành phố"
-                          />
-                        </div>
-                        <div className="row">
-                          <div className="col-md-6 mb-3">
-                            <label className="form-label">Số điện thoại</label>
-                            <input
-                              type="tel"
-                              className="form-control auth-input"
-                              name="storePhone"
-                              value={storeForm.storePhone}
-                              onChange={handleStoreChange}
-                              placeholder="Ví dụ: 0909 xxx xxx"
-                            />
-                          </div>
-                          <div className="col-md-6 mb-3">
-                            <label className="form-label">Ngành hàng</label>
-                            <select
-                              className="form-select auth-input"
-                              name="storeCategory"
-                              value={storeForm.storeCategory}
-                              onChange={handleStoreChange}
-                            >
-                              <option value="">-- Chọn ngành hàng --</option>
-                              <option value="fashion">Thời trang</option>
-                              <option value="food">Ăn uống</option>
-                              <option value="electronics">Điện tử</option>
-                              <option value="cosmetics">Mỹ phẩm</option>
-                              <option value="other">Khác</option>
-                            </select>
-                          </div>
-                        </div>
+  <>
+    <div className="mb-3">
+      <label className="form-label">
+        Tên cửa hàng<span className="text-danger">*</span>
+      </label>
+      <input
+        type="text"
+        className="form-control auth-input"
+        name="storeName"
+        value={storeForm.storeName}
+        onChange={handleStoreChange}
+        placeholder="Ví dụ: Cửa hàng Sunrise Mart"
+        required
+      />
+    </div>
 
-                        <div className="d-flex justify-content-between align-items-center mt-2">
-                          <div className="small text-muted">
-                            Bạn có thể thêm nhiều chi nhánh sau khi tạo xong.
-                          </div>
-                          <button
-                            type="button"
-                            className="btn btn-success px-4"
-                            onClick={handleNextStep}
-                          >
-                            Tiếp tục
-                          </button>
-                        </div>
-                      </>
-                    )}
+
+
+{/* Tỉnh / Quận / Phường */}
+<div className="row">
+  <div className="col-md-4 mb-3">
+    <label className="form-label">Tỉnh / Thành phố</label>
+    <select
+      className="form-select auth-input"
+      name="province"
+      value={storeForm.province}
+      onChange={handleStoreChange}
+    >
+      <option value="">-- Chọn tỉnh / thành --</option>
+      {provinces.map((p) => (
+        <option key={p.name} value={p.name}>
+          {p.name}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div className="col-md-4 mb-3">
+    <label className="form-label">Quận / Huyện</label>
+    <select
+      className="form-select auth-input"
+      name="district"
+      value={storeForm.district}
+      onChange={handleStoreChange}
+      disabled={!storeForm.province}
+    >
+      <option value="">-- Chọn quận / huyện --</option>
+      {districts.map((d) => (
+        <option key={d.name} value={d.name}>
+          {d.name}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div className="col-md-4 mb-3">
+    <label className="form-label">Phường / Xã</label>
+    <select
+      className="form-select auth-input"
+      name="ward"
+      value={storeForm.ward}
+      onChange={handleStoreChange}
+      disabled={!storeForm.district}
+    >
+      <option value="">-- Chọn phường / xã --</option>
+      {wards.map((w) => (
+        <option key={w.name} value={w.name}>
+          {w.name}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+    {/* Địa chỉ chi tiết */}
+<div className="mb-3">
+  <label className="form-label">Địa chỉ</label>
+  <input
+    type="text"
+    className="form-control auth-input"
+    name="storeAddress"
+    value={storeForm.storeAddress}
+    onChange={handleStoreChange}
+    placeholder="Số nhà, tên đường..."
+  />
+</div>
+
+    {/* Số điện thoại + Ngành hàng giữ nguyên như trước */}
+    <div className="row">
+      <div className="col-md-6 mb-3">
+        <label className="form-label">Số điện thoại</label>
+        <input
+          type="tel"
+          className="form-control auth-input"
+          name="storePhone"
+          value={storeForm.storePhone}
+          onChange={handleStoreChange}
+          placeholder="Ví dụ: 0909 xxx xxx"
+          
+        />
+      </div>
+
+      { /* Ngành hàng */}
+      
+    </div>
+
+    <div className="d-flex justify-content-between align-items-center mt-2">
+      <div className="small text-muted">
+      </div>
+      <button
+        type="button"
+        className="btn btn-success px-4"
+        onClick={handleNextStep}
+      >
+        Tiếp tục
+      </button>
+    </div>
+  </>
+)}
+
 
                     {registerStep === 2 && (
                       <>
