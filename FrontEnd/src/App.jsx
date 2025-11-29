@@ -1,7 +1,9 @@
 import HomePage from "./HomePage";
+import ShopDashboard from "./ShopDashboard";
 
 function App() {
-  return <HomePage/>
+  return <ShopDashboard/>
+  
 }
 
 export default App

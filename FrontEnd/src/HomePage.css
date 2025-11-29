@@ -1,362 +1,215 @@
-/* ================== PALETTE ================== */
-:root {
-  --primary: #2563eb;         /* xanh dương chính */
-  --primary-strong: #1d4ed8;  /* đậm hơn một chút */
-  --primary-soft: #dbeafe;    /* nền nhạt */
-  --primary-soft-2: #eff6ff;  /* nền nhạt hơn */
-  --accent: #38bdf8;          /* xanh sky/teal */
-  --text-main: #0f172a;
-  --text-sub: #6b7280;
+/* ===== base palette (you can keep your previous variables) ===== */
+:root{
+  --kv-blue: #0d6efd;
+  --kv-blue-dark: #0b5ed7;
+  --kv-green: #16a34a;
+  --card-bg: #fff;
+  --muted: #9aa0a6;
+  --input-border: #e6e9ee;
 }
 
-/* Màn hình full, background nhiều lớp */
-.auth-screen {
-  min-height: 100vh;
-  width: 100vw;
-  overflow-x: hidden;
-  background:
-    radial-gradient(circle at top left, rgba(191, 219, 254, 0.9) 0%, #f9fafb 45%),
-    radial-gradient(circle at bottom right, rgba(219, 234, 254, 0.9) 0%, #ffffff 55%);
+/* ensure full-screen background remains */
+.auth-bg-single{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background-image: url("/images/background1.jpg");
+  background-size:cover;
+  background-position:center;
+  filter: brightness(0.68);
+}
+
+/* 2) Backdrop nằm trên background */
+.modal-backdrop {
+  position: fixed ;
+  inset: 0 ;
+  z-index: 1000 ;
+    display:flex;
+  align-items:center;
+  justify-content:center;           /* overlay giữa background và dialog */
+  background: rgba(0,0,0,0.45) !important;
+  pointer-events: auto !important;
+}
+
+
+
+
+/* dialog card similar to KiotViet */
+.kv-login .kv-card{
+  width: 420px;
+  max-width: 94%;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 20px 40px rgba(15,23,42,0.25);
+  text-align: left;
+}
+
+/* logo */
+.kv-logo-wrap{ display:flex; justify-content:center; margin-bottom: 10px; }
+.kv-logo{ width:120px; height:auto; display:block; }
+
+/* form */
+.kv-form{ margin-top: 2px; }
+
+/* field */
+.kv-field{ margin-bottom: 12px; }
+.kv-label{ display:block; font-size: 13px; color: #4b5563; margin-bottom:6px; }
+
+/* input with icon wrapper */
+.kv-input-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--input-border);
+  border-radius:10px;
+  padding:10px 12px;
+  gap:8px;
+}
+.kv-input-wrap:focus-within{
+  border-color: var(--kv-blue);
+  box-shadow: 0 10px 30px rgba(13,110,253,0.08);
+}
+.kv-icon{ color:#6b7280; flex:0 0 auto; }
+.kv-input{
+  flex:1 1 auto;
+  border: none;
+  outline: none;
+  font-size:14px;
+  color: #0f172a;
+  background: transparent;
+}
+
+/* eye toggle button */
+.kv-eye{
+  background:transparent;
+  border:none;
+  padding:4px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color: #6b7280;
+  flex:0 0 auto;
+}
+
+/* remember + forgot row */
+.kv-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:2px;
+  margin-bottom:8px;
+}
+.kv-remember{ font-size:13px; color:#374151; display:flex; align-items:center; gap:8px; }
+.kv-remember input{ width:16px; height:16px; }
+.kv-forgot{ color:var(--kv-blue); text-decoration:none; font-size:13px; }
+
+/* big split actions (two equal halves) */
+.kv-actions{
+  display:flex;
+  gap:0;
+  margin-top:8px;
+  border-radius:10px;
+  overflow:hidden;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.kv-action{
+  flex:1 1 50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:12px 14px;
+  font-weight:700;
+  color: #fff;
+  cursor:pointer;
+  background: linear-gradient(180deg, #0d6efd, #0b5ed7);
+  border:none;
+  transition: transform .08s ease, box-shadow .08s ease, opacity .08s;
+  font-size:15px;
+}
+.kv-action.kv-store{
+  background: linear-gradient(180deg, #10b981, #0ea65f);
+}
+.kv-action svg{ opacity:0.95; }
+.kv-action:hover{ transform: translateY(-1px); }
+.kv-action.active{ box-shadow: 0 10px 24px rgba(2,6,23,0.12); }
+
+/* small caption */
+.kv-card > div[style] { color:var(--muted); }
+
+/* responsive */
+@media (max-width:480px){
+  .kv-login .kv-card{ padding:16px; }
+  .kv-logo{ width:100px; }
+  .kv-action{ padding:12px 8px; font-size:14px; }
+}
+/* đảm bảo backdrop và dialog nhận sự kiện chuột */
+.modal-backdrop {
+  pointer-events: auto;   /* cho phép click vào nội dung modal */
+  z-index: 1000;
+}
+
+/* dialog bên trong phải cao hơn backdrop */
+.modal-dialog {
+  pointer-events: auto;
+  z-index: 1001;
+}
+
+/* đảm bảo input nhận sự kiện */
+.kv-input, .kv-input-wrap, .kv-eye, .kv-action, .kv-card {
+  pointer-events: auto;
+}
+
+/* nếu bạn có rule global vô tình chặn pointer, override nó */
+.auth-screen, .auth-main {
+  pointer-events: auto !important;
+}
+
+/* nếu trước đó .auth-nav có pointer-events:none, gỡ hoặc override */
+.auth-nav { pointer-events: auto;
+z-index: 1002; }
+
+/* ================= FIX BUTTONS CLICKABLE ================= */
+
+/* 1) đảm bảo app chính nhận pointer events */
+.kv-app, .kv-main, .kv-content, .kv-actions {
+  pointer-events: auto !important;
+}
+
+/* 2) đảm bảo các button có pointer events (nếu bị override chặn) */
+.kv-btn, .kv-action, button, .kv-pill, .kv-search, input, select, textarea {
+  pointer-events: auto !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 3) nếu vô tình có overlay (modal-backdrop) còn tồn tại, ẩn nó trên dashboard */
+.modal-backdrop, .auth-modal, .auth-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* 4) đảm bảo header/main có z-index cao hơn overlay cũ */
+.kv-topbar { position: sticky; top: 0; z-index: 1200 !important; }
+.kv-main   { position: relative; z-index: 1100 !important; }
+
+/* 5) tăng z-index cho button nếu cần (nút trên giao diện) */
+.kv-actions .kv-btn, .kv-top-right .kv-pill {
   position: relative;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  z-index: 1300;
 }
 
-/* các mảng màu mềm phía sau */
-.auth-bg-layer {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(45px) ;
-  opacity: 0.8;
-  z-index: 0;
+/* 6) reset bất kỳ global rule `pointer-events:none` gây hại */
+*[style*="pointer-events: none"], *[onclick="return false;"] {
+  pointer-events: auto !important;
 }
 
-.auth-bg-layer-1 {
-  width: 260px;
-  height: 260px;
-  background: rgba(59, 130, 246, 0.55); /* blue */
-  top: -70px;
-  left: -40px;
-}
-
-.auth-bg-layer-2 {
-  width: 320px;
-  height: 320px;
-  background: rgba(56, 189, 248, 0.5); /* sky */
-  top: 500px;
-  right: -80px;
-}
-
-
-/* ================== HEADER ================== */
-.auth-nav {
-  position: relative;
-  z-index: 5;
-  height: 100px;
-  padding: 0 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  backdrop-filter: blur(10px);
-}
-
-.auth-nav-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.auth-logo-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: conic-gradient(from 160deg, var(--primary), var(--accent));
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
-}
-
-.auth-logo-title {
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--text-main);
-}
-
-.auth-logo-caption {
-  font-size: 11px;
-  color: var(--text-sub);
-}
-
-.auth-nav-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.auth-nav-link {
-  font-size: 13px;
-  color: var(--text-sub);
-  text-decoration: none;
-}
-
-.auth-nav-link:hover {
-  color: var(--primary-strong);
-}
-
-/* ================== MAIN WRAP ================== */
-.auth-main {
-  position: relative;
-  z-index: 5;
-  padding: 16px 0 32px;
-}
-
-/* ================== HERO LEFT ================== */
-.auth-hero {
-  padding: 16px 0 24px;
-}
-
-.auth-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--primary-strong);
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  margin-bottom: 16px;
-}
-
-.auth-hero-title {
-  font-size: 2.45rem;
-  font-weight: 800;
-  line-height: 1.25;
-  color: var(--text-main);
-  margin-bottom: 10px;
-}
-
-.auth-hero-title span {
-  color: var(--primary-strong);
-}
-
-.auth-hero-sub {
-  font-size: 0.95rem;
-  color: var(--text-sub);
-  max-width: 430px;
-  margin-bottom: 22px;
-}
-
-/* Feature cards */
-.auth-feature-row {
-  max-width: 520px;
-}
-
-.auth-feature-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  box-shadow: 0 16px 32px rgba(148, 163, 184, 0.35);
-}
-
-.auth-feature-card.small {
-  box-shadow: 0 8px 20px rgba(148, 163, 184, 0.25);
-  background: rgba(255, 255, 255, 0.97);
-}
-
-.auth-feature-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 20%, var(--accent), var(--primary));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  color: #ffffff;
-}
-
-.auth-feature-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.auth-feature-desc {
-  font-size: 0.8rem;
-  color: var(--text-sub);
-}
-
-/* mini stats dưới */
-.auth-mini-stats {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.auth-mini-stat {
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px dashed rgba(148, 163, 184, 0.9);
-  font-size: 11px;
-}
-
-.auth-mini-label {
-  color: var(--text-sub);
-}
-
-.auth-mini-value {
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-/* ================== FORM RIGHT ================== */
-.auth-panel-wrapper {
-  padding: 8px 0 8px;
-}
-
-.auth-panel {
-  background: #ffffff;
-  border-radius: 22px;
-  padding: 22px 24px 26px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 24px 45px rgba(15, 23, 42, 0.16);
-}
-
-/* input / select */
-.auth-input {
-  border-radius: 0.7rem;
-  border: 1px solid #d1d5db;
-  background-color: #ffffff;
-  font-size: 0.95rem;
-}
-
-.auth-input::placeholder {
-  color: #9ca3af;
-}
-
-.auth-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 0.16rem rgba(37, 99, 235, 0.18);
-}
-
-/* stepper */
-.auth-stepper-track {
-  height: 3px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  position: relative;
-  overflow: hidden;
-}
-
-.auth-stepper-progress {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  transform-origin: left center;
-}
-
-.auth-stepper-progress.half {
-  transform: scaleX(0.5);
-}
-
-.auth-stepper-progress.full {
-  transform: scaleX(1);
-}
-
-.auth-step-dot {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  border: 2px solid #d1d5db;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  background: #ffffff;
-  color: var(--text-sub);
-  margin: 0 auto;
-}
-
-.auth-step-dot.active {
-  border-color: var(--primary);
-  background: radial-gradient(circle at 30% 20%, var(--accent), var(--primary));
-  color: #ffffff;
-}
-
-/* ================== BUTTONS (dùng btn-success cho tiện) ================== */
-
-
-.btn-success {
-  background-color: var(--primary);
-  border-color: var(--primary);
-}
-
-.btn-success:hover {
-  background-color: var(--primary-strong);
-  border-color: var(--primary-strong);
-}
-
-.btn-outline-success {
-  color: var(--primary-strong);
-  border-color: rgba(148, 163, 184, 0.9);
-  background-color: #ffffff;  
-}
-
-.btn-outline-success:hover {
-  color: #ffffff;
-  border-color: var(--primary-strong);
-  background-color: var(--primary-strong);
-}
-
-/* ================== RESPONSIVE ================== */
-@media (max-width: 992px) {
-  .auth-main {
-    padding-top: 8px;
-  }
-
-  .auth-panel {
-    margin-top: 8px;
-  }
-
-  .auth-hero {
-    text-align: left;
-  }
-}
-
-@media (max-width: 768px) {
-  .auth-nav {
-    padding: 0 16px;
-  }
-
-  .auth-main {
-    padding-bottom: 24px;
-  }
-
-  .auth-panel {
-    border-radius: 18px;
-  }
-}
-/* ================== OVERRIDE MÀU NÚT TRONG MÀN HÌNH AUTH ================== */
-.auth-screen .btn-success,
-.auth-screen .btn-success:hover,
-.auth-screen .btn-success:focus {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-}
-
-.auth-screen .btn-outline-success,
-.auth-screen .btn-outline-success:hover,
-.auth-screen .btn-outline-success:focus {
-  color: var(--primary-strong) !important;
-  border-color: var(--primary-strong) !important;
-  background-color: #ffffff !important;
+/* 7) phòng trường hợp stacking context do transform/filter: reset trên containers chính */
+.kv-app, .kv-main, .kv-content, .kv-sidebar, .kv-right, .kv-topbar {
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
 }
