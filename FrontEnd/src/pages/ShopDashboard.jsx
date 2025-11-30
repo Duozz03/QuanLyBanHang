@@ -10,37 +10,33 @@ export default function ShopDashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null); // sản phẩm đang chỉnh sửa (null = tạo mới)
 
-  // initial demo products
+  // initial demo products (theo cấu trúc mới)
   const [products, setProducts] = useState([
     {
-      id: "10225873544",
-      sku: "10225873544",
+      product_id: "10225873544",
+      barcode_id: "89010225873544",
       name: "Bánh mì Staff chà bông 55gr",
-      price: 0,
-      img: "/images/banhstaff.jpg",
-      group: "Bánh > Bánh tươi, sandwich",
-      stock: 0,
-      brand: "Staff",
-      giaban: 0,
-      giavon: 0,
-      khachdat: 0,
-      thoigiantao: "30/11/2025",
-      dukien: "-",
+      description: "Bánh mì tươi có chà bông, gói 55gr",
+      import_price: 5000,
+      sale_price: 8000,
+      stock_quantity: 0,
+      status: "active",
+      create_at: "2025-11-30",
+      category: "Bánh > Bánh tươi, sandwich",
+      img: "/images/banhstaff.jpg", // giữ ảnh nếu có
     },
     {
-      id: "10225873545",
-      sku: "10225873545",
+      product_id: "10225873545",
+      barcode_id: "89010225873545",
       name: "Bánh quy Socola 100gr",
-      price: 12000,
+      description: "Bánh quy vị socola ngọt nhẹ",
+      import_price: 8000,
+      sale_price: 12000,
+      stock_quantity: 15,
+      status: "active",
+      create_at: "2025-12-01",
+      category: "Bánh > Bánh quy",
       img: "/images/banhscl.jpg",
-      group: "Bánh > Bánh quy",
-      stock: 15,
-      brand: "CookieCo",
-      giaban: 12000,
-      giavon: 8000,
-      khachdat: 1,
-      thoigiantao: "01/12/2025",
-      dukien: "-",
     },
   ]);
 
@@ -62,29 +58,44 @@ export default function ShopDashboard() {
   // onSave sẽ truyền (product, isEdit)
   const handleSave = (product, isEdit) => {
     if (isEdit) {
-      // cập nhật sản phẩm (theo sku)
-      setProducts((prev) => prev.map((p) => (p.sku === product.sku ? { ...p, ...product } : p)));
+      // cập nhật sản phẩm theo product_id
+      setProducts((prev) =>
+        prev.map((p) => (p.product_id === product.product_id ? { ...p, ...product } : p))
+      );
       setModalOpen(false);
-      setExpandedId(product.sku);
+      setExpandedId(product.product_id);
       setEditProduct(null);
     } else {
-      // tạo mới (nếu sku trùng -> thêm hậu tố)
-      let sku = product.sku;
-      if (products.find((p) => p.sku === sku)) {
-        sku = sku + "-" + Date.now().toString().slice(-4);
-        product.sku = sku;
-        product.id = sku;
+      // tạo mới (nếu product_id trùng -> thêm hậu tố)
+      let pid = product.product_id;
+      if (products.find((p) => p.product_id === pid)) {
+        pid = pid + "-" + Date.now().toString().slice(-4);
+        product.product_id = pid;
       }
-      setProducts((prev) => [...prev, product]);
+      // keep any missing optional fields with defaults
+      const toAdd = {
+        product_id: String(product.product_id),
+        barcode_id: product.barcode_id || "",
+        name: product.name || "",
+        description: product.description || "",
+        import_price: Number(product.import_price) || 0,
+        sale_price: Number(product.sale_price) || 0,
+        stock_quantity: Number(product.stock_quantity) || 0,
+        status: product.status || "active",
+        create_at: product.create_at || new Date().toISOString().slice(0, 10),
+        category: product.category || "",
+        img: product.img || "", // modal hiện chưa quản lý img nhưng giữ tham số nếu có
+      };
+      setProducts((prev) => [...prev, toAdd]);
       setModalOpen(false);
-      setExpandedId(product.sku);
+      setExpandedId(toAdd.product_id);
     }
   };
 
   const handleDelete = (product) => {
     if (!window.confirm(`Xóa ${product.name}?`)) return;
-    setProducts((p) => p.filter((x) => x.sku !== product.sku));
-    if (expandedId === product.sku) setExpandedId(null);
+    setProducts((p) => p.filter((x) => x.product_id !== product.product_id));
+    if (expandedId === product.product_id) setExpandedId(null);
   };
 
   return (
@@ -154,22 +165,23 @@ export default function ShopDashboard() {
                     <input type="checkbox" />
                   </th>
                   <th>Ảnh</th>
-                  <th>Mã hàng</th>
+                  <th>Product ID</th>
+                  <th>Barcode</th>
                   <th>Tên hàng</th>
-                  <th>Giá bán</th>
-                  <th>Giá vốn</th>
+                  <th>Sale price</th>
+                  <th>Import price</th>
                   <th>Tồn kho</th>
-                  <th>Khách đặt</th>
-                  <th>Thời gian tạo</th>
-                  <th>Dự kiến hết hàng</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày tạo</th>
+                  <th>Danh mục</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((r) => (
-                  <React.Fragment key={r.sku}>
+                  <React.Fragment key={r.product_id}>
                     <tr
-                      className={"kv-row " + (expandedId === r.sku ? "expanded" : "")}
-                      onClick={() => toggleRow(r.sku)}
+                      className={"kv-row " + (expandedId === r.product_id ? "expanded" : "")}
+                      onClick={() => toggleRow(r.product_id)}
                       style={{ cursor: "pointer" }}
                     >
                       <td>
@@ -177,24 +189,28 @@ export default function ShopDashboard() {
                       </td>
                       <td>
                         <img
-                          src={r.img}
+                          src={r.img || "/images/placeholder.png"}
                           alt=""
                           style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" }}
                         />
                       </td>
-                      <td>{r.sku}</td>
+                      <td>{r.product_id}</td>
+                      <td>{r.barcode_id}</td>
                       <td>{r.name}</td>
-                      <td>{r.giaban}</td>
-                      <td>{r.giavon}</td>
-                      <td>{r.stock}</td>
-                      <td>{r.khachdat}</td>
-                      <td>{r.thoigiantao}</td>
-                      <td>{r.dukien}</td>
+                      <td>{r.sale_price}</td>
+                      <td>{r.import_price}</td>
+                      <td>{r.stock_quantity}</td>
+                      <td>{r.status}</td>
+                      <td>{r.create_at}</td>
+                      <td>{r.category}</td>
                     </tr>
 
-                    {expandedId === r.sku && (
+                    {expandedId === r.product_id && (
                       <tr className="kv-detail-row">
-                        <td colSpan={10}>
+                        <td colSpan={11}>
+                          {/* ProductDetail component vẫn nhận product; nếu nó kỳ vọng các trường cũ,
+                              hãy cập nhật ProductDetail hoặc ProductDetail có thể đọc các trường mới.
+                              Bạn cũng có thể tạo bản chuyển đổi (compatibility) ở đây nếu cần). */}
                           <ProductDetail product={r} onEdit={handleEdit} onDelete={handleDelete} />
                         </td>
                       </tr>
@@ -218,7 +234,7 @@ export default function ShopDashboard() {
 
       {/* remount modal when editProduct changes by giving key -> avoids effect setState issue */}
       <CreateProductModal
-        key={editProduct ? editProduct.sku : "new"}
+        key={editProduct ? editProduct.product_id : "new"}
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);

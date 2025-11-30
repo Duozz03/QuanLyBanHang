@@ -1,11 +1,12 @@
-
-
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import "./HomePage.css";
 
 export default function AuthPage() {
   // modal luôn mở và không đóng
   const [isLoginOpen] = useState(true);
+
+  const navigate = useNavigate();
 
   // form state
   const [username, setUsername] = useState("");
@@ -134,7 +135,7 @@ export default function AuthPage() {
                   <button
                     type="button"
                     className={"kv-action kv-manage " + (mode === "admin" ? "active" : "")}
-                    onClick={() => setMode("admin")}
+                    onClick={() => navigate("/product")}
                   >
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor">
                       <path d="M3 12h18" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
