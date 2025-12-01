@@ -5,9 +5,9 @@ import HomePage from "./pages/HomePage";
 export default function App() {
   return (
     <Routes>
-  <Route path="/" element={<HomePage/>} />
+  <Route path="/login" element={<HomePage/>} />
   <Route path="/product" element={<ShopDashboard/>} />
-   
+   <Route path="*" element={<Navigate to="/login" />} />
 </Routes>
   );
 }

@@ -1,4 +1,6 @@
 package com.deuoz.BackEnd.Enum;
 
-public enum Statis {
+public enum Status {
+    ACTIVE,
+    INACTIVE,
 }
