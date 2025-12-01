@@ -7,6 +7,7 @@ export default function App() {
     <Routes>
   <Route path="/login" element={<HomePage/>} />
   <Route path="/product" element={<ShopDashboard/>} />
+  <Route path="/fogotpassword" element={<fog/>}/>
    <Route path="*" element={<Navigate to="/login" />} />
 </Routes>
   );

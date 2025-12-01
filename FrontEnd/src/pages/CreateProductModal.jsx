@@ -5,7 +5,6 @@ import "./ShopDashboard.css";
 export default function CreateProductModal({ open, onClose, onSave, initialProduct = null }) {
   // init form once from initialProduct (no effect on later updates)
   const [form, setForm] = useState(() => ({
-    product_id: initialProduct?.product_id || "",
     barcode_id: initialProduct?.barcode_id || "",
     name: initialProduct?.name || "",
     description: initialProduct?.description || "",
@@ -29,8 +28,12 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
   if (!open) return null;
 
   const handleSave = (e) => {
+    
     e.preventDefault();
-
+    console.log("handleSave chạy — form:", form);
+  // ... phần validate, build product
+  
+  onSave(product, isEdit);
     // Basic validations
     if (!form.product_id.trim() || !form.name.trim()) {
       alert("Vui lòng nhập Product ID và Tên sản phẩm.");
@@ -70,7 +73,7 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
     };
 
     const isEdit = !!initialProduct;
-    onSave(product, isEdit);
+    if (typeof onSave === "function") onSave(product, isEdit);
   };
 
   return (
@@ -81,7 +84,7 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
           <button className="kv-close" onClick={onClose}>✕</button>
         </div>
 
-        <form className="kv-modal-body" onSubmit={handleSave}>
+        <form className="kv-modal-body" method="post" onSubmit={handleSave} >
           <div className="kv-form-row">
             <label>Product ID</label>
             <input
