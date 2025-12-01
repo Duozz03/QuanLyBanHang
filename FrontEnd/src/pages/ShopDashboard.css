@@ -17,7 +17,7 @@
 
 /* topbar */
 .kv-topbar{
-  height:64px;
+  height:100px;
   background:linear-gradient(180deg,var(--blue),var(--blue-strong));
   color:white;
   display:flex;
@@ -29,11 +29,11 @@
   top:0;
   z-index:200;
 }
-.kv-brand{ display:flex; align-items:center; gap:10px; }
+.kv-brand{ display:flex; align-items:center; gap:10px; margin-left: 20px;}
 .kv-brand-icon{ width:34px; height:34px; background:#fff; color:var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; }
 .kv-brand-text{ font-weight:700; font-size:15px; letter-spacing:0.2px; }
 .kv-navlinks{ display:flex; gap:10px; margin-left:18px; align-items:center; }
-.kv-link{ color:rgba(255,255,255,0.95); text-decoration:none; padding:8px 10px; border-radius:6px; font-size:14px; opacity:0.95; }
+.kv-link{ color:rgba(255,255,255,0.95); text-decoration:none; padding:8px 5px; margin:10px 0px ; border-radius:6px; font-size:14px; opacity:0.95; }
 .kv-link.active{ background: rgba(255,255,255,0.12); }
 
 /* top right */
@@ -185,3 +185,12 @@
 }
 .kv-modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
 .kv-primary { background: linear-gradient(180deg,#0d6efd,#0b5ed7); color:#fff; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; }
+
+.kv-row:hover {
+  background-color: #dbe5f1; /* màu nền khi hover */
+  transition: 0.15s ease-in-out;
+}
+
+thead{
+  background-color: #87a6d5;
+}

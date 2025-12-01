@@ -104,7 +104,7 @@ export default function ShopDashboard() {
       <header className="kv-topbar">
         <div className="kv-top-left">
           <div className="kv-brand">
-            <div className="kv-brand-icon">🟦</div>
+            <img style={{ width: 50, height: 50, borderRadius: 8, objectFit: "cover" }} src="../public/images/logo.png" alt="" />
             <div className="kv-brand-text">Deuoz</div>
           </div>
 
@@ -127,12 +127,14 @@ export default function ShopDashboard() {
             >
               Khách hàng
             </button>
+
+            <div className="kv-top-right">
+          <button className="kv-btn kv-pill kv-primary">Bán hàng</button>
+        </div>
           </nav>
         </div>
 
-        <div className="kv-top-right">
-          <button className="kv-btn kv-pill kv-primary">Bán hàng</button>
-        </div>
+        
       </header>
 
       {/* main */}
@@ -166,14 +168,12 @@ export default function ShopDashboard() {
                   </th>
                   <th>Ảnh</th>
                   <th>Product ID</th>
-                  <th>Barcode</th>
                   <th>Tên hàng</th>
                   <th>Sale price</th>
                   <th>Import price</th>
                   <th>Tồn kho</th>
                   <th>Trạng thái</th>
                   <th>Ngày tạo</th>
-                  <th>Danh mục</th>
                 </tr>
               </thead>
               <tbody>
@@ -195,14 +195,12 @@ export default function ShopDashboard() {
                         />
                       </td>
                       <td>{r.product_id}</td>
-                      <td>{r.barcode_id}</td>
                       <td>{r.name}</td>
                       <td>{r.sale_price}</td>
                       <td>{r.import_price}</td>
                       <td>{r.stock_quantity}</td>
                       <td>{r.status}</td>
                       <td>{r.create_at}</td>
-                      <td>{r.category}</td>
                     </tr>
 
                     {expandedId === r.product_id && (
