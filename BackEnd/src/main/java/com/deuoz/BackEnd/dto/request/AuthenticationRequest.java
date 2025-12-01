@@ -1,0 +1,4 @@
+package com.deuoz.BackEnd.dto.request;
+
+public class AuthenticationRequest {
+}
