@@ -1,15 +1,20 @@
 // ProductDetail.jsx
 import React from "react";
 import "./ShopDashboard.css"; // dùng chung CSS (hoặc tạo file CSS riêng nếu muốn)
+// import useProducts from "../data/useProducts";
+
 
 export default function ProductDetail({ product, onEdit, onDelete }) {
-  // product: { product_id, barcode_id, name, description, import_price, sale_price, stock_quantity, status, create_at, category, img }
+
+
   if (!product) return null;
 
   const formatCurrency = (v) => {
     if (v == null || isNaN(Number(v))) return "0";
     return Number(v).toLocaleString();
   };
+
+
 
   return (
     <div className="kv-detail-card" onClick={(e) => e.stopPropagation()}>
@@ -36,6 +41,7 @@ export default function ProductDetail({ product, onEdit, onDelete }) {
           <div>
             <div className="label">Barcode</div>
             <div className="value">{product.barcode_id || "—"}</div>
+            <></>
           </div>
 
           <div>

@@ -3,12 +3,19 @@ import React, { useState } from "react";
 import "./ShopDashboard.css";
 import ProductDetail from "./ProductDetail";
 import CreateProductModal from "./CreateProductModal";
+// import useProducts from "../data/useProducts";
 
 export default function ShopDashboard() {
+
+
   const [active, setActive] = useState("hanghoa");
   const [expandedId, setExpandedId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null); // sản phẩm đang chỉnh sửa (null = tạo mới)
+
+        // const { data, loading, error } = useProducts();
+  
+    
 
   // initial demo products (theo cấu trúc mới)
   const [products, setProducts] = useState([
@@ -39,6 +46,11 @@ export default function ShopDashboard() {
       img: "/images/banhscl.jpg",
     },
   ]);
+
+// if (loading) return <div>Loading...</div>;
+//     if (error) return <div>Error: {error.message}</div>;
+//     if (!data || data.length === 0) return <div>Không có sản phẩm</div>;
+
 
   const toggleRow = (id) => setExpandedId((p) => (p === id ? null : id));
 

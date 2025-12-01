@@ -1,24 +1,30 @@
 // CreateProductModal.jsx
 import React, { useState } from "react";
+import axios from "axios"
 import "./ShopDashboard.css";
 
 export default function CreateProductModal({ open, onClose, onSave, initialProduct = null }) {
   // init form once from initialProduct (no effect on later updates)
+  
   const [form, setForm] = useState(() => ({
-    barcode_id: initialProduct?.barcode_id || "",
+    barcode: initialProduct?.barcode || "",
     name: initialProduct?.name || "",
+    urlImage: initialProduct?.urlImage || "",
     description: initialProduct?.description || "",
-    import_price: initialProduct?.import_price != null ? String(initialProduct.import_price) : "",
-    sale_price: initialProduct?.sale_price != null ? String(initialProduct.sale_price) : "",
-    stock_quantity: initialProduct?.stock_quantity != null ? String(initialProduct.stock_quantity) : "",
-    status: initialProduct?.status || "active", // "active" or "inactive"
-    create_at:
-      initialProduct?.create_at
+    importPrice: initialProduct?.importPrice != null ? String(initialProduct.importPrice) : "",
+    price: initialProduct?.price != null ? String(initialProduct.price) : "",
+    quantity: initialProduct?.quantity != null ? String(initialProduct.quantity) : "",
+    status: initialProduct?.status || "ACTIVE", // "active" or "inactive"
+    createAt:
+      initialProduct?.createAt
         ? // normalize to yyyy-mm-dd for date input if possible
-          (initialProduct.create_at.length >= 10 ? initialProduct.create_at.slice(0, 10) : initialProduct.create_at)
+          (initialProduct.createAt.length >= 10 ? initialProduct.createAt.slice(0, 10) : initialProduct.createAt)
         : new Date().toISOString().slice(0, 10),
     category: initialProduct?.category || "",
   }));
+
+  const [selectedFile, setSelectedFile] = useState(null);
+const [previewUrl, setPreviewUrl] = useState(form.urlImage || null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,54 +33,84 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
 
   if (!open) return null;
 
-  const handleSave = (e) => {
-    
-    e.preventDefault();
-    console.log("handleSave chạy — form:", form);
-  // ... phần validate, build product
-  
-  onSave(product, isEdit);
-    // Basic validations
-    if (!form.product_id.trim() || !form.name.trim()) {
-      alert("Vui lòng nhập Product ID và Tên sản phẩm.");
-      return;
-    }
+const handleSave = async (e) => {
+  e.preventDefault();
+  console.log("handleSave chạy — form:", form);
 
-    const importPriceNum = Number(form.import_price);
-    const salePriceNum = Number(form.sale_price);
-    const stockNum = parseInt(form.stock_quantity === "" ? "0" : form.stock_quantity, 10);
+  const importPriceNum = Number(form.importPrice);
+  const salePriceNum = Number(form.price);
+  const stockNum = parseInt(form.quantity === "" ? "0" : form.quantity, 10);
 
-    if (isNaN(importPriceNum) || importPriceNum < 0) {
-      alert("Import price phải là số >= 0.");
-      return;
-    }
-    if (isNaN(salePriceNum) || salePriceNum < 0) {
-      alert("Sale price phải là số >= 0.");
-      return;
-    }
-    if (isNaN(stockNum) || stockNum < 0) {
-      alert("Stock quantity phải là số nguyên >= 0.");
-      return;
-    }
+  if (isNaN(importPriceNum) || importPriceNum < 0) {
+    alert("Import price phải là số >= 0.");
+    return;
+  }
+  if (isNaN(salePriceNum) || salePriceNum < 0) {
+    alert("Sale price phải là số >= 0.");
+    return;
+  }
+  if (isNaN(stockNum) || stockNum < 0) {
+    alert("Stock quantity phải là số nguyên >= 0.");
+    return;
+  }
 
-    // Build product object with appropriate types
-    const product = {
-      product_id: String(form.product_id).trim(),
-      barcode_id: String(form.barcode_id).trim(),
-      name: String(form.name).trim(),
-      description: String(form.description || "").trim(),
-      import_price: importPriceNum,
-      sale_price: salePriceNum,
-      stock_quantity: stockNum,
-      status: String(form.status || "active"),
-      // store create_at as ISO date string (yyyy-mm-dd). If want full timestamp, parent can transform.
-      create_at: String(form.create_at),
-      category: String(form.category || "").trim(),
-    };
-
-    const isEdit = !!initialProduct;
-    if (typeof onSave === "function") onSave(product, isEdit);
+  // Build product object
+  const product = {
+    barcode: form.barcode.trim(),
+    name: form.name.trim(),
+    description: form.description.trim(),
+    importPrice: importPriceNum,
+    price: salePriceNum,
+    quantity: stockNum,
+    status: form.status,
+    createAt: form.create_at,
+    category: form.category.trim(),
   };
+
+  const isEdit = !!initialProduct;
+  const url = "http://localhost:8080/products";
+
+  // Fake file ảnh để test (sau này thay bằng file thật từ input type="file")
+ 
+
+  // Tạo FormData chứa cả product JSON và file ảnh
+  const formData = new FormData();
+  formData.append("product", new Blob([JSON.stringify(product)], { type: "application/json" }));
+if (selectedFile) {
+  formData.append("image", selectedFile);
+}
+
+  try {
+    let res;
+    if (isEdit) {
+      // PUT để chỉnh sửa
+      res = await axios.put(url, formData);
+    } else {
+      // POST để tạo mới
+      res = await axios.post(url, formData);
+    }
+
+    console.log("Kết quả từ backend:", res.data);
+    if (typeof onSave === "function") onSave(res.data, isEdit);
+  } catch (err) {
+    console.error("Lỗi khi gửi dữ liệu:", err);
+    alert("Gửi dữ liệu thất bại: " + err.message);
+  }
+};
+
+const handleImageChange = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    return;
+  }
+
+  // tạo preview
+  const url = URL.createObjectURL(file);
+  setSelectedFile(file);
+  setPreviewUrl(url);
+};
 
   return (
     <div className="kv-modal-backdrop" onClick={onClose}>
@@ -97,9 +133,34 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
 
           <div className="kv-form-row">
             <label>Barcode ID</label>
-            <input name="barcode_id" value={form.barcode_id} onChange={handleChange} />
+            <input name="barcode" value={form.barcode_id} onChange={handleChange} />
+
           </div>
 
+          <div className="kv-form-row">
+  <label>Hình ảnh</label>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleImageChange}
+  />
+
+  {previewUrl && (
+    <div style={{ marginTop: 10 }}>
+      <img
+        src={previewUrl}
+        alt="preview"
+        style={{
+          width: 150,
+          height: 150,
+          objectFit: "cover",
+          borderRadius: 6,
+          border: "1px solid #ccc",
+        }}
+      />
+    </div>
+  )}
+</div>
           <div className="kv-form-row">
             <label>Tên hàng</label>
             <input name="name" value={form.name} onChange={handleChange} />
@@ -114,7 +175,7 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
             <div style={{ flex: 1 }}>
               <label>Import price</label>
               <input
-                name="import_price"
+                name="importPrice"
                 value={form.import_price}
                 onChange={handleChange}
                 type="number"
@@ -126,7 +187,7 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
             <div style={{ flex: 1 }}>
               <label>Sale price</label>
               <input
-                name="sale_price"
+                name="price"
                 value={form.sale_price}
                 onChange={handleChange}
                 type="number"
@@ -141,7 +202,7 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
             <div style={{ flex: 1 }}>
               <label>Stock quantity</label>
               <input
-                name="stock_quantity"
+                name="quantity"
                 value={form.stock_quantity}
                 onChange={handleChange}
                 type="number"
@@ -160,14 +221,14 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
             <div style={{ flex: 1 }}>
               <label>Status</label>
               <select name="status" value={form.status} onChange={handleChange}>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
               </select>
             </div>
 
             <div style={{ flex: 1 }}>
               <label>Create at</label>
-              <input name="create_at" value={form.create_at} onChange={handleChange} type="date" />
+              <input name="createAt" value={form.create_at} onChange={handleChange} type="date" />
             </div>
           </div>
 
