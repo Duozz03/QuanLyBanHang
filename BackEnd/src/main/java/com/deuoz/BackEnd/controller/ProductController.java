@@ -4,6 +4,8 @@ import com.deuoz.BackEnd.dto.request.ProductCreationRequest;
 import com.deuoz.BackEnd.dto.request.ProductUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ApiResponse;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
+import com.deuoz.BackEnd.entity.Product;
+import com.deuoz.BackEnd.repository.ProductRepository;
 import com.deuoz.BackEnd.service.ProductService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,7 +25,7 @@ import java.util.List;
 @Slf4j
 public class ProductController {
     private final ProductService productService;
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ApiResponse<ProductResponse> addProduct(@RequestPart("product") ProductCreationRequest product,
                                             @RequestPart("image") MultipartFile image) throws Exception{
         return ApiResponse.<ProductResponse>builder()
@@ -37,9 +39,11 @@ public class ProductController {
                 .build();
     }
     @PutMapping("/{productId}")
-    ApiResponse<ProductResponse> updateProduct(@PathVariable("productId") Long id,@RequestBody ProductUpdateRequest request){
+    ApiResponse<ProductResponse> updateProduct(
+            @PathVariable("productId") Long id,@RequestPart("product") ProductUpdateRequest request,
+            @RequestPart("image") MultipartFile image) throws Exception{
         return ApiResponse.<ProductResponse>builder()
-                .result(productService.updateProduct(id,request))
+                .result(productService.updateProduct(id,request,image))
                 .build();
     }
     @DeleteMapping("/{productId}")
@@ -48,5 +52,16 @@ public class ProductController {
         return ApiResponse.<String>builder()
                 .result("Product with id " + id + " was deleted")
                 .build();
+    }
+    //Endpoint to load ảnh
+    @GetMapping("/products/{id}/image")
+    public ApiResponse<byte[]> getProductImage(@PathVariable Long id) {
+        Product product = productService.getProduct(id);
+        byte[] imageData = product.getUrlImage();
+
+        return ApiResponse.<byte[]>builder()
+                .result(imageData)
+                .build();
+
     }
 }

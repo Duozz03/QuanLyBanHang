@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -36,21 +37,39 @@ public class ProductService {
             throw new RuntimeException("Failed to upload product image", e);
         }
         return  productMapper.toProductResponse(productRepository.save(product))
-                .withImageUrl("/products/" + product.getId() + "/image");
+                             .withImageUrl("/products/" + product.getId() + "/image");
     }
 
-    public ProductResponse updateProduct(Long id, ProductUpdateRequest productRequest) {
+    public ProductResponse updateProduct(Long id, ProductUpdateRequest productRequest,MultipartFile productImage)
+            throws IOException {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product with id " + id + " not found"));
         productMapper.updateProduct(product, productRequest);
-        return productMapper.toProductResponse(productRepository.save(product));
+        try {
+            product.setUrlImage(productImage.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload product image", e);
+        }
+        return productMapper.toProductResponse(productRepository.save(product))
+                            .withImageUrl("/products/" + product.getId() + "/image");
     }
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll().stream()
-                .map(productMapper::toProductResponse)
+                .map(product -> {
+                    ProductResponse resp = productMapper.toProductResponse(product);
+                    if (product.getUrlImage() != null) {
+                        String base64 = Base64.getEncoder().encodeToString(product.getUrlImage());
+                        resp.setUrlImage("/products/" + product.getId() + "/image");
+                    }
+                    return resp;
+                })
+
                 .toList();
+    }
+    public Product getProduct(Long id) {
+        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product with id " + id + " not found"));
     }
 }
