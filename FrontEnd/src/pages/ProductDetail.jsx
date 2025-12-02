@@ -24,7 +24,7 @@ export default function ProductDetail({ product, onEdit, onDelete }) {
     <div className="kv-detail-card" onClick={(e) => e.stopPropagation()}>
       <div className="kv-detail-left">
         <img
-          src={product.img || "/images/product-placeholder.png"}
+          src={product.urlImage || "/images/product-placeholder.png"}
           alt={product.name}
           style={{ width: 120, height: 120, borderRadius: 8, objectFit: "cover" }}
         />
@@ -39,28 +39,28 @@ export default function ProductDetail({ product, onEdit, onDelete }) {
         <div className="kv-detail-grid" style={{ marginTop: 12 }}>
           <div>
             <div className="label">Product ID</div>
-            <div className="value">{product.product_id || "—"}</div>
+            <div className="value">{product.id || "—"}</div>
           </div>
 
           <div>
             <div className="label">Barcode</div>
-            <div className="value">{product.barcode_id || "—"}</div>
+            <div className="value">{product.barcode || "—"}</div>
             <></>
           </div>
 
           <div>
             <div className="label">Tồn kho</div>
-            <div className="value">{product.stock_quantity ?? 0}</div>
+            <div className="value">{product.quantity ?? 0}</div>
           </div>
 
           <div>
             <div className="label">Sale price</div>
-            <div className="value">{formatCurrency(product.sale_price)}</div>
+            <div className="value">{formatCurrency(product.price)}</div>
           </div>
 
           <div>
             <div className="label">Import price</div>
-            <div className="value">{formatCurrency(product.import_price)}</div>
+            <div className="value">{formatCurrency(product.importPrice)}</div>
           </div>
 
           <div>
@@ -70,7 +70,7 @@ export default function ProductDetail({ product, onEdit, onDelete }) {
 
           <div>
             <div className="label">Ngày tạo</div>
-            <div className="value">{product.create_at || "—"}</div>
+            <div className="value">{product.createAt || "—"}</div>
           </div>
 
           <div>
