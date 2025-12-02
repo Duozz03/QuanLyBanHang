@@ -1,10 +1,14 @@
 // ProductDetail.jsx
 import React from "react";
 import "./ShopDashboard.css"; // dùng chung CSS (hoặc tạo file CSS riêng nếu muốn)
-// import useProducts from "../data/useProducts";
+
+
 
 
 export default function ProductDetail({ product, onEdit, onDelete }) {
+
+
+
 
 
   if (!product) return null;

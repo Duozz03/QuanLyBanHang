@@ -1,9 +1,9 @@
 // ShopDashboard.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ShopDashboard.css";
 import ProductDetail from "./ProductDetail";
 import CreateProductModal from "./CreateProductModal";
-// import useProducts from "../data/useProducts";
+import axios from "axios";
 
 export default function ShopDashboard() {
 
@@ -18,34 +18,46 @@ export default function ShopDashboard() {
     
 
   // initial demo products (theo cấu trúc mới)
-  const [products, setProducts] = useState([
-    {
-      product_id: "10225873544",
-      barcode_id: "89010225873544",
-      name: "Bánh mì Staff chà bông 55gr",
-      description: "Bánh mì tươi có chà bông, gói 55gr",
-      import_price: 5000,
-      sale_price: 8000,
-      stock_quantity: 0,
-      status: "active",
-      create_at: "2025-11-30",
-      category: "Bánh > Bánh tươi, sandwich",
-      img: "/images/banhstaff.jpg", // giữ ảnh nếu có
-    },
-    {
-      product_id: "10225873545",
-      barcode_id: "89010225873545",
-      name: "Bánh quy Socola 100gr",
-      description: "Bánh quy vị socola ngọt nhẹ",
-      import_price: 8000,
-      sale_price: 12000,
-      stock_quantity: 15,
-      status: "active",
-      create_at: "2025-12-01",
-      category: "Bánh > Bánh quy",
-      img: "/images/banhscl.jpg",
-    },
-  ]);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        // 1. Lấy danh sách sản phẩm 
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`);
+        const data = res.data.result;
+
+        // 2. Load ảnh cho từng sản phẩm
+        const urlImage = await Promise.all(
+          data.map(async (p) => {
+            try {
+              const imgRes = await axios.get(
+                `${import.meta.env.VITE_API_BASE_URL}/products/${p.id}/image`
+              );
+
+              const base64 = btoa(
+                new Uint8Array(imgRes.data.result).reduce(
+                  (d, b) => d + String.fromCharCode(b),
+                  ""
+                )
+              );
+              return { ...p, urlImage: `data:image/jpeg;base64,${base64}` };
+            } catch (e) {
+              return { ...p, urlImage: "/images/product-placeholder.png", e };
+            }
+          })
+        );
+
+        setProducts(urlImage);
+      } catch (err) {
+        console.error(err);
+        alert("Lỗi khi tải sản phẩm");
+      }
+    };
+
+    loadProducts();
+  }, []);
+
 
 // if (loading) return <div>Loading...</div>;
 //     if (error) return <div>Error: {error.message}</div>;
@@ -72,29 +84,30 @@ export default function ShopDashboard() {
     if (isEdit) {
       // cập nhật sản phẩm theo product_id
       setProducts((prev) =>
-        prev.map((p) => (p.product_id === product.product_id ? { ...p, ...product } : p))
+        prev.map((p) => (p.id === product.id ? { ...p, ...product } : p))
       );
       setModalOpen(false);
-      setExpandedId(product.product_id);
+      setExpandedId(product.id);
       setEditProduct(null);
     } else {
       // tạo mới (nếu product_id trùng -> thêm hậu tố)
-      let pid = product.product_id;
-      if (products.find((p) => p.product_id === pid)) {
+      let pid = product.id;
+      if (products.find((p) => p.id === pid)) {
         pid = pid + "-" + Date.now().toString().slice(-4);
-        product.product_id = pid;
+        product.id = pid;
       }
       // keep any missing optional fields with defaults
       const toAdd = {
-        product_id: String(product.product_id),
-        barcode_id: product.barcode_id || "",
+        id: String(product.id),
+        barcode: product.barcode || "",
         name: product.name || "",
+        urlImage: product.urlImage,
         description: product.description || "",
-        import_price: Number(product.import_price) || 0,
-        sale_price: Number(product.sale_price) || 0,
-        stock_quantity: Number(product.stock_quantity) || 0,
+        importPrice: Number(product.importPrice) || 0,
+        price: Number(product.price) || 0,
+        quantity: Number(product.quantity) || 0,
         status: product.status || "active",
-        create_at: product.create_at || new Date().toISOString().slice(0, 10),
+        createAt: product.createAt || new Date().toISOString().slice(0, 10),
         category: product.category || "",
         img: product.img || "", // modal hiện chưa quản lý img nhưng giữ tham số nếu có
       };
@@ -192,8 +205,8 @@ export default function ShopDashboard() {
                 {products.map((r) => (
                   <React.Fragment key={r.product_id}>
                     <tr
-                      className={"kv-row " + (expandedId === r.product_id ? "expanded" : "")}
-                      onClick={() => toggleRow(r.product_id)}
+                      className={"kv-row " + (expandedId === r.id ? "expanded" : "")}
+                      onClick={() => toggleRow(r.id)}
                       style={{ cursor: "pointer" }}
                     >
                       <td>
@@ -201,21 +214,21 @@ export default function ShopDashboard() {
                       </td>
                       <td>
                         <img
-                          src={r.img || "/images/placeholder.png"}
+                          src={r.urlImage || "/images/placeholder.png"}
                           alt=""
                           style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" }}
                         />
                       </td>
-                      <td>{r.product_id}</td>
+                      <td>{r.id}</td>
                       <td>{r.name}</td>
-                      <td>{r.sale_price}</td>
-                      <td>{r.import_price}</td>
-                      <td>{r.stock_quantity}</td>
+                      <td>{r.price}</td>
+                      <td>{r.importPrice}</td>
+                      <td>{r.quantity}</td>
                       <td>{r.status}</td>
-                      <td>{r.create_at}</td>
+                      <td>{r.createAt}</td>
                     </tr>
 
-                    {expandedId === r.product_id && (
+                    {expandedId === r.id && (
                       <tr className="kv-detail-row">
                         <td colSpan={11}>
                           {/* ProductDetail component vẫn nhận product; nếu nó kỳ vọng các trường cũ,
