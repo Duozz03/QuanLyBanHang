@@ -5,10 +5,8 @@ import com.deuoz.BackEnd.dto.request.ProductUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ApiResponse;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
 import com.deuoz.BackEnd.entity.Product;
-import com.deuoz.BackEnd.repository.ProductRepository;
 import com.deuoz.BackEnd.service.ProductService;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -21,39 +19,44 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class ProductController {
-    private final ProductService productService;
+    private ProductService productService;
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ApiResponse<ProductResponse> addProduct(@RequestPart("product") ProductCreationRequest product,
-                                            @RequestPart("image") MultipartFile image) throws Exception{
+            @RequestPart("image") MultipartFile image) throws Exception {
         return ApiResponse.<ProductResponse>builder()
-                .result(productService.createProduct(product,image))
+                .result(productService.createProduct(product, image))
                 .build();
     }
+
     @GetMapping
-    ApiResponse<List<ProductResponse>> getAllProducts(){
+    ApiResponse<List<ProductResponse>> getAllProducts() {
         return ApiResponse.<List<ProductResponse>>builder()
                 .result(productService.getAllProducts())
                 .build();
     }
+
     @PutMapping("/{productId}")
     ApiResponse<ProductResponse> updateProduct(
-            @PathVariable("productId") Long id,@RequestPart("product") ProductUpdateRequest request,
-            @RequestPart("image") MultipartFile image) throws Exception{
+            @PathVariable("productId") Long id, @RequestPart("product") ProductUpdateRequest request,
+            @RequestPart("image") MultipartFile image) throws Exception {
         return ApiResponse.<ProductResponse>builder()
-                .result(productService.updateProduct(id,request,image))
+                .result(productService.updateProduct(id, request, image))
                 .build();
     }
+
     @DeleteMapping("/{productId}")
-    ApiResponse<String> deleteProduct(@PathVariable("productId") Long id){
+    ApiResponse<String> deleteProduct(@PathVariable("productId") Long id) {
         productService.deleteProduct(id);
         return ApiResponse.<String>builder()
                 .result("Product with id " + id + " was deleted")
                 .build();
     }
-    //Endpoint to load ảnh
+
+    // Endpoint to load ảnh
     @GetMapping("/products/{id}/image")
     public ApiResponse<byte[]> getProductImage(@PathVariable Long id) {
         Product product = productService.getProduct(id);
