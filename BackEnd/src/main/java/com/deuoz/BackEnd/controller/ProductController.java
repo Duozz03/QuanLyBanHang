@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,13 +56,11 @@ public class ProductController {
     }
     //Endpoint to load ảnh
     @GetMapping("/products/{id}/image")
-    public ApiResponse<byte[]> getProductImage(@PathVariable Long id) {
+    public ResponseEntity<byte[]> getProductImage(@PathVariable Long id) {
         Product product = productService.getProduct(id);
         byte[] imageData = product.getUrlImage();
 
-        return ApiResponse.<byte[]>builder()
-                .result(imageData)
-                .build();
-
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG).body(imageData);
     }
 }
