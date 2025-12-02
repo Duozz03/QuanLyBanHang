@@ -69,10 +69,7 @@ const handleSave = async (e) => {
 
   const isEdit = !!initialProduct;
   const url = "http://localhost:8080/products";
-
-  // Fake file ảnh để test (sau này thay bằng file thật từ input type="file")
  
-
   // Tạo FormData chứa cả product JSON và file ảnh
   const formData = new FormData();
   formData.append("product", new Blob([JSON.stringify(product)], { type: "application/json" }));
