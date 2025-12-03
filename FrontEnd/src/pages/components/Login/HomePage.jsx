@@ -1,6 +1,6 @@
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import "./HomePage.css";
 
 export default function AuthPage() {
@@ -53,7 +53,7 @@ export default function AuthPage() {
       sessionStorage.getItem("accessToken");
     if (token) {
       axios
-        .get("http://localhost:8080/users/2", {
+        .get("http://localhost:8080/users/0", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setUsername(res.data))
@@ -61,7 +61,7 @@ export default function AuthPage() {
     }
       navigate("/products");
     } catch (err) {
-      alert("Đăng nhập thất bại!");
+      alert("Đăng nhập thất bại!", err);
     }
 
   };
