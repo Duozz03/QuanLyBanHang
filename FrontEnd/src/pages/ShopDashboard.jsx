@@ -126,13 +126,58 @@ export default function ShopDashboard() {
   return (
     <div className="kv-app">
       {/* header simplified */}
-      <header className="kv-topbar">
-        <div className="kv-top-left">
-          <div className="kv-brand">
-            <img style={{ width: 50, height: 50, borderRadius: 8, objectFit: "cover" }} src="../public/images/logo.png" alt="" />
-            <div className="kv-brand-text">Deuoz</div>
+      <div className="parent">
+           <div className="kv-brand">
+                <img style={{ width: 50, height: 50, borderRadius: 8, objectFit: "cover" }} src="../public/images/logo.png" alt="" />
+                <div className="kv-brand-text">Deuoz</div>
           </div>
+          <div className="kv-option">
+              <div className="kv-top-icons">
 
+  <div className="kv-icon-item">
+    <i className="fa-solid fa-truck-fast"></i>
+    <span>Giao hàng</span>
+  </div>
+
+  <div className="kv-icon-item">
+    <i className="fa-regular fa-circle"></i>
+    <span>Chủ đề</span>
+  </div>
+
+  <div className="kv-icon-item">
+    <i className="fa-regular fa-message"></i>
+    <span>Hỗ trợ</span>
+  </div>
+
+  <div className="kv-icon-item">
+    <i className="fa-regular fa-comment-dots"></i>
+    <span>Góp ý</span>
+  </div>
+
+  <div className="kv-icon-item">
+    <img src="https://flagcdn.com/w20/vn.png" className="kv-flag" />
+    <span>Tiếng Việt</span>
+  </div>
+
+  <div className="kv-icon-circle">
+    <i className="fa-regular fa-bell"></i>
+  </div>
+
+  <div className="kv-icon-circle">
+    <i className="fa-solid fa-gear"></i>
+  </div>
+
+  <div className="kv-avatar">
+    <img src="https://i.pravatar.cc/40" />
+  </div>
+
+</div>
+          </div>
+          </div>
+          
+      <header className="kv-topbar">
+      
+        <div className="kv-top-left">
           <nav className="kv-navlinks">
             <button
               className={"kv-link " + (active === "hanghoa" ? "active" : "")}
@@ -214,7 +259,7 @@ export default function ShopDashboard() {
                       </td>
                       <td>
                         <img
-                          src={r.urlImage || "/images/placeholder.png"}
+                          src={r.urlImage || "..public/images/placeholder.png"}
                           alt=""
                           style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" }}
                         />
