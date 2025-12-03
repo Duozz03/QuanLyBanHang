@@ -17,18 +17,53 @@ export default function AuthPage() {
   const [showPass, setShowPass] = useState(false);
 
   const userRef = useRef(null);
-  useEffect(() => {
-    if (isLoginOpen && userRef.current) userRef.current.focus();
-    // lock scroll
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => (document.body.style.overflow = prev);
-  }, [isLoginOpen]);
+  // useEffect(() => {
+  //   const token =
+  //     localStorage.getItem("accessToken") ||
+  //     sessionStorage.getItem("accessToken");
+  //   if (token) {
+  //     axios
+  //       .get("http://localhost:8080/users/2", {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       })
+  //       .then((res) => setUser(res.data))
+  //       .catch((err) => console.error("Lỗi lấy user:", err));
+  //   }
 
-  const handleSubmit = (e) => {
+  // }, []);
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // gọi API / kiểm tra DB ở đây (bạn nói đã có DB)
-    alert(`Đăng nhập: ${username}\nChế độ: ${mode}\nDuy trì: ${remember}`);
+    try {
+      const res =  await axios.post("http://localhost:8080/auth/token", {
+        username,
+        password,
+      });
+      
+    
+      const  accessToken = res.data.result.token;
+      console.log("Login response:", res.data.result.token);
+      if (remember) {
+        localStorage.setItem("accessToken", accessToken);
+      } else {
+        sessionStorage.setItem("accessToken", accessToken);
+      }
+         const token =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
+    if (token) {
+      axios
+        .get("http://localhost:8080/users/2", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setUsername(res.data))
+        .catch((err) => console.error("Lỗi lấy user:", err));
+    }
+      navigate("/products");
+    } catch (err) {
+      alert("Đăng nhập thất bại!");
+    }
+
   };
 
   return (
@@ -136,7 +171,7 @@ export default function AuthPage() {
                   <button
                     type="button"
                     className={"kv-action kv-manage " + (mode === "admin" ? "active" : "")}
-                    onClick={() => navigate("/product")}
+                    onClick={()=> navigate("/product")}
                   >
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor">
                       <path d="M3 12h18" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

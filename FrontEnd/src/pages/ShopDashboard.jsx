@@ -21,10 +21,21 @@ export default function ShopDashboard() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
+
     const loadProducts = async () => {
       try {
         // 1. Lấy danh sách sản phẩm 
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`);
+        const token =
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/products`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
         const data = res.data.result;
 
         // 2. Load ảnh cho từng sản phẩm
@@ -32,16 +43,16 @@ export default function ShopDashboard() {
           data.map(async (p) => {
             try {
               const imgRes = await axios.get(
-                `${import.meta.env.VITE_API_BASE_URL}/products/${p.id}/image`
+                `${import.meta.env.VITE_API_BASE_URL}/products/${p.id}/image`,
+                              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+
               );
 
-              const base64 = btoa(
-                new Uint8Array(imgRes.data.result).reduce(
-                  (d, b) => d + String.fromCharCode(b),
-                  ""
-                )
-              );
-              return { ...p, urlImage: `data:image/jpeg;base64,${base64}` };
+              const base64String = imgRes.data.result;
+    
+              return { ...p, urlImage: `data:image/jpeg;base64,${base64String}` };
             } catch (e) {
               return { ...p, urlImage: "/images/product-placeholder.png", e };
             }
@@ -203,7 +214,7 @@ export default function ShopDashboard() {
               </thead>
               <tbody>
                 {products.map((r) => (
-                  <React.Fragment key={r.product_id}>
+                  <React.Fragment key={r.id}>
                     <tr
                       className={"kv-row " + (expandedId === r.id ? "expanded" : "")}
                       onClick={() => toggleRow(r.id)}
@@ -214,7 +225,7 @@ export default function ShopDashboard() {
                       </td>
                       <td>
                         <img
-                          src={r.urlImage || "/images/placeholder.png"}
+                          src={r.urlImage}
                           alt=""
                           style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" }}
                         />

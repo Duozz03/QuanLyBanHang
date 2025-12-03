@@ -1,7 +1,7 @@
 package com.deuoz.BackEnd.service;
 
-import com.deuoz.BackEnd.dto.request.ProductCreationRequest;
-import com.deuoz.BackEnd.dto.request.ProductUpdateRequest;
+import com.deuoz.BackEnd.dto.request.Product.ProductCreationRequest;
+import com.deuoz.BackEnd.dto.request.ProductRequest.ProductUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
 import com.deuoz.BackEnd.entity.Product;
 import com.deuoz.BackEnd.mapper.ProductMapper;
@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
