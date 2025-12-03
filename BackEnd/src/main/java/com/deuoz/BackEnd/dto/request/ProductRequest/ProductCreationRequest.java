@@ -1,4 +1,4 @@
-package com.deuoz.BackEnd.dto.request.Product;
+package com.deuoz.BackEnd.dto.request.ProductRequest;
 
 import com.deuoz.BackEnd.Enum.Status;
 import lombok.*;

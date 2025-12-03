@@ -1,13 +1,12 @@
 package com.deuoz.BackEnd.controller;
 
-import com.deuoz.BackEnd.dto.request.Product.ProductCreationRequest;
+import com.deuoz.BackEnd.dto.request.ProductRequest.ProductCreationRequest;
 import com.deuoz.BackEnd.dto.request.ProductRequest.ProductUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ApiResponse;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
 import com.deuoz.BackEnd.entity.Product;
 import com.deuoz.BackEnd.service.ProductService;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +52,7 @@ public class ProductController {
                 .build();
     }
     //Endpoint to load ảnh
-    @GetMapping("/products/{id}/image")
+    @GetMapping("/{id}/image")
     public ApiResponse<byte[]> getProductImage(@PathVariable Long id) {
         Product product = productService.getProduct(id);
         byte[] imageData = product.getUrlImage();

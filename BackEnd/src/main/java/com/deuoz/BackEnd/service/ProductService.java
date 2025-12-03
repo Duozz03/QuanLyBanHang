@@ -1,6 +1,6 @@
 package com.deuoz.BackEnd.service;
 
-import com.deuoz.BackEnd.dto.request.Product.ProductCreationRequest;
+import com.deuoz.BackEnd.dto.request.ProductRequest.ProductCreationRequest;
 import com.deuoz.BackEnd.dto.request.ProductRequest.ProductUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
 import com.deuoz.BackEnd.entity.Product;
