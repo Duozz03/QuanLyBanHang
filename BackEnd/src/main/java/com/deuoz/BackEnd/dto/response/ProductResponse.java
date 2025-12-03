@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponse {
+    Long id;
     String urlImage;
     String barcode;
     String name;

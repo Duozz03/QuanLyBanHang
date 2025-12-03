@@ -1,4 +1,4 @@
-package com.deuoz.BackEnd.dto.request;
+package com.deuoz.BackEnd.dto.request.ProductRequest;
 
 import com.deuoz.BackEnd.Enum.Status;
 import lombok.*;
@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductCreationRequest {
+public class ProductUpdateRequest {
     String barcode;
     String name;
     String description;

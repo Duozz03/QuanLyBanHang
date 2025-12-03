@@ -1,35 +1,24 @@
-package com.deuoz.BackEnd.entity;
+package com.deuoz.BackEnd.dto.request.UserRequest;
 
 import com.deuoz.BackEnd.Enum.Role;
 import com.deuoz.BackEnd.Enum.Status;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.Set;
 
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity
-
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+public class UserUpdateRequest {
     String username;
     String password;
     String fullName;
     String address;
     String email;
-    Date create_at;
     Status status;
     Role roles;
 }

@@ -78,13 +78,14 @@ if (selectedFile) {
 }
 
   try {
+    const token =localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
     let res;
     if (isEdit) {
       // PUT để chỉnh sửa
-      res = await axios.put(url, formData);
+      res = await axios.put(url, formData,{headers: { Authorization: `Bearer ${token}`}},);
     } else {
       // POST để tạo mới
-      res = await axios.post(url, formData);
+      res = await axios.post(url, formData,{headers: { Authorization: `Bearer ${token}`}},);
     }
 
     console.log("Kết quả từ backend:", res.data);
