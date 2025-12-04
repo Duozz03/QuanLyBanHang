@@ -103,12 +103,13 @@ export default function ShopDashboard() {
   const handleDelete = async (product) => {
     try {
       const token =
-          localStorage.getItem("accessToken") ||
-          sessionStorage.getItem("accessToken");
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
       // gọi API xóa trên backend bằng axios
-      await axios.delete( `${import.meta.env.VITE_API_BASE_URL}/products/${product.id}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-              );
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/products/${product.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       // cập nhật lại state frontend
       setProducts((prev) => prev.filter((p) => p.id !== product.id));
