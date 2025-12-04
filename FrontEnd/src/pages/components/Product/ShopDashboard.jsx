@@ -87,7 +87,7 @@ export default function ShopDashboard() {
         price: Number(product.price) || 0,
         quantity: Number(product.quantity) || 0,
         status: product.status || "ACTIVE",
-        createAt: product.createAt || new Date().toISOString().slice(0, 10),
+        createdAt: product.createdAt || new Date().slice(0, 10),
         category: product.category || "",
         img: product.img || "",
       };
@@ -266,7 +266,7 @@ export default function ShopDashboard() {
                           <td>{r.importPrice}</td>
                           <td>{r.quantity}</td>
                           <td>{r.status}</td>
-                          <td>{r.createAt}</td>
+                          <td>{r.createdAt}</td>
                         </tr>
 
                         {expandedId === r.id && (
