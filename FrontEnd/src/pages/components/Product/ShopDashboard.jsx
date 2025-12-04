@@ -34,7 +34,10 @@ export default function ShopDashboard() {
                 { headers: { Authorization: `Bearer ${token}` } }
               );
               const base64String = imgRes.data.result;
-              return { ...p, urlImage: `data:image/jpeg;base64,${base64String}` };
+              return {
+                ...p,
+                urlImage: `data:image/jpeg;base64,${base64String}`,
+              };
             } catch (e) {
               return { ...p, urlImage: "/images/product-placeholder.png", e };
             }
@@ -97,23 +100,42 @@ export default function ShopDashboard() {
     }
   };
 
-  const handleDelete = (product) => {
-    if (!window.confirm(`Xóa ${product.name}?`)) return;
-    setProducts((p) => p.filter((x) => x.id !== product.id));
-    if (expandedId === product.id) setExpandedId(null);
+  const handleDelete = async (product) => {
+    try {
+      const token =
+          localStorage.getItem("accessToken") ||
+          sessionStorage.getItem("accessToken");
+      // gọi API xóa trên backend bằng axios
+      await axios.delete( `${import.meta.env.VITE_API_BASE_URL}/products/${product.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+
+      // cập nhật lại state frontend
+      setProducts((prev) => prev.filter((p) => p.id !== product.id));
+    } catch (err) {
+      console.error("Xóa thất bại:", err);
+    }
   };
 
   return (
     <div className="kv-app">
       {/* top thin white bar (kept kv styles) */}
-      <div className="kv-topbar" style={{ background: "linear-gradient(180deg,#fff,#fff)" }}>
+      <div
+        className="kv-topbar"
+        style={{ background: "linear-gradient(180deg,#fff,#fff)" }}
+      >
         <div className="container-fluid d-flex align-items-center justify-content-between">
           <div className="d-flex align-items-center">
             <div className="kv-brand">
               <img
                 src="/images/logo.png"
                 alt="logo"
-                style={{ width: 64, height: 50, objectFit: "contain", marginLeft: 0}}
+                style={{
+                  width: 64,
+                  height: 50,
+                  objectFit: "contain",
+                  marginLeft: 0,
+                }}
               />
               <div className="kv-brand-text ms-2 text-dark">Deuoz</div>
             </div>
@@ -142,7 +164,11 @@ export default function ShopDashboard() {
               </div>
 
               <div className="kv-icon-item">
-                <img src="https://flagcdn.com/w20/vn.png" className="kv-flag" alt="vn" />
+                <img
+                  src="https://flagcdn.com/w20/vn.png"
+                  className="kv-flag"
+                  alt="vn"
+                />
                 <span>Tiếng Việt</span>
               </div>
 
@@ -163,10 +189,14 @@ export default function ShopDashboard() {
       </div>
 
       {/* blue nav strip using kv styles but bootstrap containers */}
-      <header className="kv-topbar" style={{ background: "linear-gradient(180deg,var(--blue),var(--blue-strong))", padding: "10px 0" }}>
+      <header
+        className="kv-topbar"
+        style={{
+          background: "linear-gradient(180deg,var(--blue),var(--blue-strong))",
+          padding: "10px 0",
+        }}
+      >
         <div className="container-fluid d-flex align-items-center justify-content-between">
-        
-
           <nav className="kv-navlinks ">
             <button
               className={"kv-link " + (active === "hanghoa" ? "active" : "")}
@@ -186,7 +216,6 @@ export default function ShopDashboard() {
             >
               Khách hàng
             </button>
-           
           </nav>
 
           <div className="kv-top-right ms-auto ">
@@ -217,8 +246,13 @@ export default function ShopDashboard() {
           <section className="col-12 col-lg-6">
             <div className="d-flex align-items-center justify-content-between mb-3 kv-content-head">
               <div className="kv-actions">
-                <input className="kv-search" placeholder="Tìm theo mã, tên hàng" />
-                <button className="kv-btn" onClick={openCreate}>+ Tạo mới</button>
+                <input
+                  className="kv-search"
+                  placeholder="Tìm theo mã, tên hàng"
+                />
+                <button className="kv-btn" onClick={openCreate}>
+                  + Tạo mới
+                </button>
                 <button className="kv-btn">Import file</button>
                 <button className="kv-btn">Xuất file</button>
               </div>
@@ -246,18 +280,28 @@ export default function ShopDashboard() {
                     {products.map((r) => (
                       <React.Fragment key={r.id}>
                         <tr
-                          className={"kv-row " + (expandedId === r.id ? "expanded" : "")}
+                          className={
+                            "kv-row " + (expandedId === r.id ? "expanded" : "")
+                          }
                           onClick={() => toggleRow(r.id)}
                           style={{ cursor: "pointer" }}
                         >
                           <td>
-                            <input type="checkbox" onClick={(e) => e.stopPropagation()} />
+                            <input
+                              type="checkbox"
+                              onClick={(e) => e.stopPropagation()}
+                            />
                           </td>
                           <td>
                             <img
                               src={r.urlImage || "/images/placeholder.png"}
                               alt=""
-                              style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" }}
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: 6,
+                                objectFit: "cover",
+                              }}
                             />
                           </td>
                           <td>{r.id}</td>
@@ -272,7 +316,11 @@ export default function ShopDashboard() {
                         {expandedId === r.id && (
                           <tr className="kv-detail-row">
                             <td colSpan={9}>
-                              <ProductDetail product={r} onEdit={handleEdit} onDelete={handleDelete} />
+                              <ProductDetail
+                                product={r}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                              />
                             </td>
                           </tr>
                         )}
@@ -281,7 +329,9 @@ export default function ShopDashboard() {
 
                     {products.length === 0 && (
                       <tr>
-                        <td colSpan={9} className="text-center p-4 muted">Không có sản phẩm</td>
+                        <td colSpan={9} className="text-center p-4 muted">
+                          Không có sản phẩm
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -294,7 +344,9 @@ export default function ShopDashboard() {
           <aside className="col-12 col-lg-3">
             <div className="kv-card-small">
               <h5>Gợi ý</h5>
-              <p className="kv-muted">Sử dụng bộ lọc bên trái để tìm nhanh hàng hóa.</p>
+              <p className="kv-muted">
+                Sử dụng bộ lọc bên trái để tìm nhanh hàng hóa.
+              </p>
             </div>
           </aside>
         </div>

@@ -16,17 +16,12 @@ export default function CreateProductModal({ open, onClose, onSave, initialProdu
     importPrice: initialProduct?.importPrice != null ? String(initialProduct.importPrice) : "",
     price: initialProduct?.price != null ? String(initialProduct.price) : "",
     quantity: initialProduct?.quantity != null ? String(initialProduct.quantity) : "",
-    status: initialProduct?.status || "ACTIVE", // "active" or "inactive"
-    createAt:
-      initialProduct?.createAt
-        ? // normalize to yyyy-mm-dd for date input if possible
-          (initialProduct.createAt.length >= 10 ? initialProduct.createAt.slice(0, 10) : initialProduct.createAt)
-        : new Date().toISOString().slice(0, 10),
+    status: initialProduct?.status || "ACTIVE", // "active" or "inactive",
     category: initialProduct?.category || "",
   }));
 
   const [selectedFile, setSelectedFile] = useState(null);
-const [previewUrl, setPreviewUrl] = useState(form.urlImage || null);
+  const [previewUrl, setPreviewUrl] = useState(form.urlImage || null);
 
 
 
@@ -67,7 +62,6 @@ const handleSave = async (e) => {
     price: salePriceNum,
     quantity: stockNum,
     status: form.status,
-    createAt: form.createAt,
     category: form.category.trim(),
   };
 
@@ -77,16 +71,19 @@ const handleSave = async (e) => {
   // Tạo FormData chứa cả product JSON và file ảnh
   const formData = new FormData();
   formData.append("product", new Blob([JSON.stringify(product)], { type: "application/json" }));
-if (selectedFile) {
-  formData.append("image", selectedFile);
-}
+  if (selectedFile) {
+    formData.append("image", selectedFile);
+  }else {
+    formData.append("image", new Blob([], { type: "application/octet-stream" }));
+  }
 
   try {
     const token =localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
     let res;
     if (isEdit) {
       // PUT để chỉnh sửa
-      res = await axios.put(url, formData,{headers: { Authorization: `Bearer ${token}`}},);
+      const productId = initialProduct.id;
+      res = await axios.put(`${url}/${productId}`, formData,{headers: { Authorization: `Bearer ${token}`}},);
     } else {
       // POST để tạo mới
       res = await axios.post(url, formData,{headers: { Authorization: `Bearer ${token}`}},);
