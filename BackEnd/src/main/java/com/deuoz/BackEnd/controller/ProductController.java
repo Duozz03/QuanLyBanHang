@@ -39,7 +39,7 @@ public class ProductController {
     @PutMapping("/{productId}")
     ApiResponse<ProductResponse> updateProduct(
             @PathVariable("productId") Long id,@RequestPart("product") ProductUpdateRequest request,
-            @RequestPart("image") MultipartFile image) throws Exception{
+            @RequestPart(value ="image",required = false) MultipartFile image) throws Exception{
         return ApiResponse.<ProductResponse>builder()
                 .result(productService.updateProduct(id,request,image))
                 .build();

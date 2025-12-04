@@ -28,9 +28,6 @@ public class ProductService {
     ProductMapper productMapper;
     public ProductResponse createProduct(ProductCreationRequest productRequest, MultipartFile productImage)
             throws IOException {
-        if(productRepository.existsByName((productRequest.getName()))){
-            throw new RuntimeException("Product with name " + productRequest.getName() + " already exists");
-        }
         var product = productMapper.toProduct(productRequest);
         try {
             product.setUrlImage(productImage.getBytes());
@@ -47,7 +44,9 @@ public class ProductService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
         productMapper.updateProduct(product, productRequest);
         try {
-            product.setUrlImage(productImage.getBytes());
+            if(productImage!=null && !productImage.isEmpty()){
+                product.setUrlImage(productImage.getBytes());
+            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload product image", e);
         }
