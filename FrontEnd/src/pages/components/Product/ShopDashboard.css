@@ -102,15 +102,15 @@
 }
 
 
-.kv-brand{ display:flex; align-items:center; gap:10px; margin-left: 125px;}
+.kv-brand{ display:flex; align-items:center; gap:10px; margin-left: 90px;}
 .kv-brand-icon{ width:34px; height:34px; background:#fff; color:var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; }
 .kv-brand-text{ font-weight:700; font-size:15px; letter-spacing:0.2px; }
-.kv-navlinks{ display:flex; gap:10px; margin-left:18px; align-items:center; margin: 0 108px;}
-.kv-link{ color:rgba(255,255,255,0.95); text-decoration:none; padding:8px 5px; margin:10px 0px ; border-radius:6px; font-size:14px; opacity:0.95; }
+.kv-navlinks{ display:flex; gap:10px;  align-items:center; margin: 0 110px;}
+.kv-link{ color:rgba(255,255,255,0.95); text-decoration:none; padding:8px 5px; margin: 0px  ; border-radius:6px; font-size:14px; opacity:0.95; }
 .kv-link.active{ background: rgba(255,255,255,0.12); }
 
 /* top right */
-.kv-top-right{ display:flex; align-items:center; gap:12px; }
+.kv-top-right{ display:flex; align-items:center; gap:12px; margin-right:110px ;}
 .kv-pill{ padding:8px 14px; border-radius:8px; border:none; color:white; font-weight:700; }
 
 /* main layout */
@@ -138,7 +138,7 @@
 .kv-search{ padding:8px 10px; border-radius:8px; border:1px solid #e6e9ee; min-width:320px; }
 
 /* buttons */
-.kv-btn{ background:#fff; border:1px solid #e6e9ee; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.kv-btn{ background:#fff; border:1px solid #e6e9ee; padding:8px 12px; border-radius:8px; cursor:pointer; z-index: 0; }
 .kv-btn:hover{ background-color: rgba(8, 12, 22, 0.04); }
 
 /* table */
@@ -168,6 +168,10 @@
   display:flex;
   gap:10px;
   align-items:center;
+}
+
+tbody:hover{
+  background: rgba(255,255,255,0.08);
 }
 
 /* style for nav items */

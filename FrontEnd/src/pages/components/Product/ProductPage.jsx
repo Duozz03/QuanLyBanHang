@@ -38,7 +38,7 @@ const handleSave = async (product, isEdit) => {
   console.log("ProductPage.handleSave nhận:", product, isEdit);
 
   const url = isEdit
-    ? `http://localhost:8080/api/products/${encodeURIComponent(product.product_id)}`
+    ? `http://localhost:8080/api/products/${encodeURIComponent(product.id)}`
     : "http://localhost:8080/api/products";
 
   const method = isEdit ? "PUT" : "POST";
@@ -81,11 +81,11 @@ throw new Error(message);
 
     const saved = JSON.parse(text); // response json parsed
     console.log("Sản phẩm đã lưu:", saved);
-    alert("Lưu thành công: " + (saved.product_id || saved.name || "OK"));
+    alert("Lưu thành công: " + (saved.id || saved.name || "OK"));
 
     // cập nhật UI
     if (isEdit) {
-      setProducts(prev => prev.map(p => p.product_id === saved.product_id ? saved : p));
+      setProducts(prev => prev.map(p => p.id === saved.id ? saved : p));
     } else {
       setProducts(prev => [saved, ...prev]);
     }

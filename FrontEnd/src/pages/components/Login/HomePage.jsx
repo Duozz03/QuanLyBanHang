@@ -1,6 +1,6 @@
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import "./HomePage.css";
 
 export default function AuthPage() {
@@ -53,19 +53,20 @@ export default function AuthPage() {
     const token =
       localStorage.getItem("accessToken") ||
       sessionStorage.getItem("accessToken");
+    if (token) {
+      axios
+        .get("http://localhost:8080/users/myInfo", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setUsername(res.data))
+        .catch((err) => console.error("Lỗi lấy user:", err));
+    }
+      navigate("/products");
+    } catch (err) {
+      alert("Đăng nhập thất bại!");
+    }
 
-    const userRes = await axios.get("http://localhost:8080/users/myInfo", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setUsername(userRes.data);
-    console.log("ok");
-    navigate("/products");
-  } catch (err) {
-    alert("Đăng nhập thất bại!");
-    console.error("Lỗi:", err);
-  }
-};
+  };
 
   return (
     <div className="auth-screen">

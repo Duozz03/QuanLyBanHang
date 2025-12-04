@@ -1,0 +1,76 @@
+.custom-backdrop,
+.modal-backdrop.show {
+  background-color: rgba(0, 0, 0, 0.35) !important; /* giảm opacity so với trước */
+  backdrop-filter: none !important; /* tắt blur nếu có */
+  z-index: 1050 !important;
+  pointer-events: auto;
+}
+
+/* Modal container: đặt trên backdrop, căn giữa */
+.modal.d-block {
+  position: fixed;
+  inset: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1060 !important; /* lớn hơn backdrop */
+  -webkit-overflow-scrolling: touch;
+  isolation: isolate; /* đảm bảo modal không inherit opacity/filter */
+}
+
+/* Modal dialog lớn hơn để tránh bị cắt */
+.modal-dialog {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0;
+  z-index: 1065 !important;
+}
+
+/* Modal content: nền trắng đục, opacity 1 */
+.modal-content {
+  background-color: #ffffff !important; /* chắc chắn là trắng */
+  color: #111827;
+  border-radius: 10px;
+  box-shadow: 0 14px 50px rgba(16, 24, 40, 0.35);
+  border: none;
+  overflow: visible;
+  opacity: 1 !important; /* override mọi opacity thừa */
+  transform: translateZ(0); /* tạo stacking context riêng */
+  z-index: 1070 !important;
+}
+
+/* Nếu có rule global đặt opacity/filter lên #root hoặc .kv-app, override cho modal và backdrop */
+#root.modal-open,
+.kv-app.modal-open,
+body.modal-open {
+  /* không thay đổi root, nhưng đảm bảo modal không chịu ảnh hưởng */
+}
+
+/* Tránh mờ các con bên trong modal */
+.modal-content * {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Nếu có overlay layer bên ngoài modal (ví dụ .overlay), ẩn nó khi modal mở */
+.overlay,
+.page-overlay {
+  display: none !important;
+}
+
+/* Inputs & cards giữ độ sắc nét */
+.form-control, .form-select, textarea {
+  background: #ffffff;
+  border: 1px solid #e6eef9;
+  box-shadow: none;
+  color: #111827;
+}
+
+/* Footer/Buttons giữ rõ */
+.modal-footer { background: #fff; border-top: 1px solid #eef2f6; }
+
+/* Một số tweak responsive */
+@media (max-width: 992px) {
+  .modal-dialog { max-width: 92%; }
+}
