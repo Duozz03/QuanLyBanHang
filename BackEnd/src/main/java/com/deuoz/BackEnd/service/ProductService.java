@@ -4,6 +4,8 @@ import com.deuoz.BackEnd.dto.request.ProductRequest.ProductCreationRequest;
 import com.deuoz.BackEnd.dto.request.ProductRequest.ProductUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
 import com.deuoz.BackEnd.entity.Product;
+import com.deuoz.BackEnd.exception.AppException;
+import com.deuoz.BackEnd.exception.ErrorCode;
 import com.deuoz.BackEnd.mapper.ProductMapper;
 import com.deuoz.BackEnd.repository.ProductRepository;
 import lombok.AccessLevel;
@@ -42,7 +44,7 @@ public class ProductService {
     public ProductResponse updateProduct(Long id, ProductUpdateRequest productRequest,MultipartFile productImage)
             throws IOException {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product with id " + id + " not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
         productMapper.updateProduct(product, productRequest);
         try {
             product.setUrlImage(productImage.getBytes());
@@ -69,6 +71,6 @@ public class ProductService {
                 .toList();
     }
     public Product getProduct(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product with id " + id + " not found"));
+        return productRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
     }
 }

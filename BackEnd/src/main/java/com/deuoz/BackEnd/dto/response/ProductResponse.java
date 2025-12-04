@@ -4,6 +4,7 @@ import com.deuoz.BackEnd.Enum.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -21,7 +22,7 @@ public class ProductResponse {
     double importPrice;
     int quantity;
     Status status;
-    Date createdAt;
+    LocalDate createdAt;
     String category;
     public ProductResponse withImageUrl(String imageUrl) {
         this.setUrlImage(imageUrl);

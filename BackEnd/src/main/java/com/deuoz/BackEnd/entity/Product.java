@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -28,6 +28,11 @@ public class Product {
     double importPrice;
     int quantity;
     Status status;
-    Date createdAt;
+    LocalDate createdAt;
     String category;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now();
+    }
 }

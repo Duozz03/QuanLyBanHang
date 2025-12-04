@@ -34,7 +34,7 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request){
+    public AuthenticationResponse  authenticate(AuthenticationRequest request){
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));

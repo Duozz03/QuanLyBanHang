@@ -6,36 +6,31 @@ import CreateProductModal from "./CreateProductModal";
 import axios from "axios";
 
 export default function ShopDashboard() {
-
-
   const [active, setActive] = useState("hanghoa");
   const [expandedId, setExpandedId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null); // sản phẩm đang chỉnh sửa (null = tạo mới)
 
-        // const { data, loading, error } = useProducts();
-  
-    
+  // const { data, loading, error } = useProducts();
 
   // initial demo products (theo cấu trúc mới)
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-
     const loadProducts = async () => {
       try {
-        // 1. Lấy danh sách sản phẩm 
+        //0. Lấy token
         const token =
-        localStorage.getItem("accessToken") ||
-        sessionStorage.getItem("accessToken");
-
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/products`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
+          localStorage.getItem("accessToken") ||
+          sessionStorage.getItem("accessToken");
+        // 1. Lấy danh sách sản phẩm
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/products`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log(res.data);
         const data = res.data.result;
 
         // 2. Load ảnh cho từng sản phẩm
@@ -44,15 +39,17 @@ export default function ShopDashboard() {
             try {
               const imgRes = await axios.get(
                 `${import.meta.env.VITE_API_BASE_URL}/products/${p.id}/image`,
-                              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
               );
 
               const base64String = imgRes.data.result;
-    
-              return { ...p, urlImage: `data:image/jpeg;base64,${base64String}` };
+
+              return {
+                ...p,
+                urlImage: `data:image/jpeg;base64,${base64String}`,
+              };
             } catch (e) {
               return { ...p, urlImage: "/images/product-placeholder.png", e };
             }
@@ -68,12 +65,6 @@ export default function ShopDashboard() {
 
     loadProducts();
   }, []);
-
-
-// if (loading) return <div>Loading...</div>;
-//     if (error) return <div>Error: {error.message}</div>;
-//     if (!data || data.length === 0) return <div>Không có sản phẩm</div>;
-
 
   const toggleRow = (id) => setExpandedId((p) => (p === id ? null : id));
 
@@ -117,77 +108,83 @@ export default function ShopDashboard() {
         importPrice: Number(product.importPrice) || 0,
         price: Number(product.price) || 0,
         quantity: Number(product.quantity) || 0,
-        status: product.status || "active",
-        createAt: product.createAt || new Date().toISOString().slice(0, 10),
+        status: product.status || "Còn kinh doanh",
+        createdAt: product.createdAt || new Date().slice(0, 10),
         category: product.category || "",
         img: product.img || "", // modal hiện chưa quản lý img nhưng giữ tham số nếu có
       };
       setProducts((prev) => [...prev, toAdd]);
       setModalOpen(false);
-      setExpandedId(toAdd.product_id);
+      setExpandedId(toAdd.id);
     }
   };
 
   const handleDelete = (product) => {
     if (!window.confirm(`Xóa ${product.name}?`)) return;
-    setProducts((p) => p.filter((x) => x.product_id !== product.product_id));
-    if (expandedId === product.product_id) setExpandedId(null);
+    setProducts((p) => p.filter((x) => x.id !== product.id));
+    if (expandedId === product.id) setExpandedId(null);
   };
 
   return (
     <div className="kv-app">
       {/* header simplified */}
       <div className="parent">
-           <div className="kv-brand">
-                <img style={{ width: 50, height: 50, borderRadius: 8, objectFit: "cover" }} src="../public/images/logo.png" alt="" />
-                <div className="kv-brand-text">Deuoz</div>
+        <div className="kv-brand">
+          <img
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 8,
+              objectFit: "cover",
+            }}
+            src="../public/images/logo.png"
+            alt=""
+          />
+          <div className="kv-brand-text">Deuoz</div>
+        </div>
+        <div className="kv-option">
+          <div className="kv-top-icons">
+            <div className="kv-icon-item">
+              <i className="fa-solid fa-truck-fast"></i>
+              <span>Giao hàng</span>
+            </div>
+
+            <div className="kv-icon-item">
+              <i className="fa-regular fa-circle"></i>
+              <span>Chủ đề</span>
+            </div>
+
+            <div className="kv-icon-item">
+              <i className="fa-regular fa-message"></i>
+              <span>Hỗ trợ</span>
+            </div>
+
+            <div className="kv-icon-item">
+              <i className="fa-regular fa-comment-dots"></i>
+              <span>Góp ý</span>
+            </div>
+
+            <div className="kv-icon-item">
+              <img src="https://flagcdn.com/w20/vn.png" className="kv-flag" />
+              <span>Tiếng Việt</span>
+            </div>
+
+            <div className="kv-icon-circle">
+              <i className="fa-regular fa-bell"></i>
+            </div>
+
+            <div className="kv-icon-circle">
+              <i className="fa-solid fa-gear"></i>
+            </div>
+
+            <div className="kv-avatar">
+              <img src="https://i.pravatar.cc/40" />
+            </div>
           </div>
-          <div className="kv-option">
-              <div className="kv-top-icons">
+        </div>
+      </div>
 
-  <div className="kv-icon-item">
-    <i className="fa-solid fa-truck-fast"></i>
-    <span>Giao hàng</span>
-  </div>
-
-  <div className="kv-icon-item">
-    <i className="fa-regular fa-circle"></i>
-    <span>Chủ đề</span>
-  </div>
-
-  <div className="kv-icon-item">
-    <i className="fa-regular fa-message"></i>
-    <span>Hỗ trợ</span>
-  </div>
-
-  <div className="kv-icon-item">
-    <i className="fa-regular fa-comment-dots"></i>
-    <span>Góp ý</span>
-  </div>
-
-  <div className="kv-icon-item">
-    <img src="https://flagcdn.com/w20/vn.png" className="kv-flag" />
-    <span>Tiếng Việt</span>
-  </div>
-
-  <div className="kv-icon-circle">
-    <i className="fa-regular fa-bell"></i>
-  </div>
-
-  <div className="kv-icon-circle">
-    <i className="fa-solid fa-gear"></i>
-  </div>
-
-  <div className="kv-avatar">
-    <img src="https://i.pravatar.cc/40" />
-  </div>
-
-</div>
-          </div>
-          </div>
-          
       <header className="kv-topbar">
-      
         <div className="kv-top-left">
           <nav className="kv-navlinks">
             <button
@@ -210,12 +207,10 @@ export default function ShopDashboard() {
             </button>
 
             <div className="kv-top-right">
-          <button className="kv-btn kv-pill kv-primary">Bán hàng</button>
-        </div>
+              <button className="kv-btn kv-pill kv-primary">Bán hàng</button>
+            </div>
           </nav>
         </div>
-
-        
       </header>
 
       {/* main */}
@@ -231,7 +226,10 @@ export default function ShopDashboard() {
           <div className="kv-content-head">
             <h3>Danh sách hàng hóa</h3>
             <div className="kv-actions">
-              <input className="kv-search" placeholder="Tìm theo mã, tên hàng" />
+              <input
+                className="kv-search"
+                placeholder="Tìm theo mã, tên hàng"
+              />
               <button className="kv-btn" onClick={openCreate}>
                 + Tạo mới
               </button>
@@ -261,18 +259,28 @@ export default function ShopDashboard() {
                 {products.map((r) => (
                   <React.Fragment key={r.id}>
                     <tr
-                      className={"kv-row " + (expandedId === r.id ? "expanded" : "")}
+                      className={
+                        "kv-row " + (expandedId === r.id ? "expanded" : "")
+                      }
                       onClick={() => toggleRow(r.id)}
                       style={{ cursor: "pointer" }}
                     >
                       <td>
-                        <input type="checkbox" onClick={(e) => e.stopPropagation()} />
+                        <input
+                          type="checkbox"
+                          onClick={(e) => e.stopPropagation()}
+                        />
                       </td>
                       <td>
                         <img
                           src={r.urlImage || "/images/placeholder.png"}
                           alt=""
-                          style={{ width: 28, height: 28, borderRadius: 6, objectFit: "cover" }}
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 6,
+                            objectFit: "cover",
+                          }}
                         />
                       </td>
                       <td>{r.id}</td>
@@ -281,7 +289,7 @@ export default function ShopDashboard() {
                       <td>{r.importPrice}</td>
                       <td>{r.quantity}</td>
                       <td>{r.status}</td>
-                      <td>{r.createAt}</td>
+                      <td>{r.createdAt}</td>
                     </tr>
 
                     {expandedId === r.id && (
@@ -290,7 +298,11 @@ export default function ShopDashboard() {
                           {/* ProductDetail component vẫn nhận product; nếu nó kỳ vọng các trường cũ,
                               hãy cập nhật ProductDetail hoặc ProductDetail có thể đọc các trường mới.
                               Bạn cũng có thể tạo bản chuyển đổi (compatibility) ở đây nếu cần). */}
-                          <ProductDetail product={r} onEdit={handleEdit} onDelete={handleDelete} />
+                          <ProductDetail
+                            product={r}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                          />
                         </td>
                       </tr>
                     )}
@@ -304,7 +316,9 @@ export default function ShopDashboard() {
         <aside className="kv-right">
           <div className="kv-card-small">
             <h5>Gợi ý</h5>
-            <p className="kv-muted">Sử dụng bộ lọc bên trái để tìm nhanh hàng hóa.</p>
+            <p className="kv-muted">
+              Sử dụng bộ lọc bên trái để tìm nhanh hàng hóa.
+            </p>
           </div>
         </aside>
       </div>

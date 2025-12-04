@@ -19,6 +19,5 @@ public class ProductUpdateRequest {
     double importPrice;
     int quantity;
     Status status;
-    Date createdAt;
     String category;
 }
