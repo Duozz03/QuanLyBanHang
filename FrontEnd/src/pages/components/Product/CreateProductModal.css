@@ -1,76 +1,79 @@
-.custom-backdrop,
-.modal-backdrop.show {
-  background-color: rgba(0, 0, 0, 0.35) !important; /* giảm opacity so với trước */
-  backdrop-filter: none !important; /* tắt blur nếu có */
-  z-index: 1050 !important;
-  pointer-events: auto;
+/* =========================
+   BACKDROP
+========================= */
+.custom-backdrop {
+  background-color: rgba(0, 0, 0, 0.35);
+  z-index: 1050;
 }
 
-/* Modal container: đặt trên backdrop, căn giữa */
+/* =========================
+   MODAL CONTAINER
+========================= */
 .modal.d-block {
   position: fixed;
   inset: 0;
-  display: flex !important;
-  align-items: center;
+
+  display: flex;
+  align-items: flex-start;     /* 👈 QUAN TRỌNG */
   justify-content: center;
-  padding: 24px;
-  z-index: 1060 !important; /* lớn hơn backdrop */
-  -webkit-overflow-scrolling: touch;
-  isolation: isolate; /* đảm bảo modal không inherit opacity/filter */
+
+  padding-top: 100px;          /* 👈 ĐẨY DƯỚI HEADER */
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 24px;
+
+  overflow-y: auto;            /* 👈 SCROLL CHUẨN */
+  z-index: 1060;
 }
 
-/* Modal dialog lớn hơn để tránh bị cắt */
-.modal-dialog {
-  max-width: 1100px;
+/* =========================
+   MODAL DIALOG
+========================= */
+.custom-modal-dialog {
   width: 100%;
-  margin: 0;
-  z-index: 1065 !important;
+  max-width: 1100px;
+
+  margin: 0 !important;        /* ❌ XOÁ MARGIN BOOTSTRAP */
 }
 
-/* Modal content: nền trắng đục, opacity 1 */
+/* =========================
+   MODAL CONTENT
+========================= */
 .modal-content {
-  background-color: #ffffff !important; /* chắc chắn là trắng */
-  color: #111827;
-  border-radius: 10px;
-  box-shadow: 0 14px 50px rgba(16, 24, 40, 0.35);
-  border: none;
-  overflow: visible;
-  opacity: 1 !important; /* override mọi opacity thừa */
-  transform: translateZ(0); /* tạo stacking context riêng */
-  z-index: 1070 !important;
-}
-
-/* Nếu có rule global đặt opacity/filter lên #root hoặc .kv-app, override cho modal và backdrop */
-#root.modal-open,
-.kv-app.modal-open,
-body.modal-open {
-  /* không thay đổi root, nhưng đảm bảo modal không chịu ảnh hưởng */
-}
-
-/* Tránh mờ các con bên trong modal */
-.modal-content * {
-  opacity: 1 !important;
-  filter: none !important;
-}
-
-/* Nếu có overlay layer bên ngoài modal (ví dụ .overlay), ẩn nó khi modal mở */
-.overlay,
-.page-overlay {
-  display: none !important;
-}
-
-/* Inputs & cards giữ độ sắc nét */
-.form-control, .form-select, textarea {
   background: #ffffff;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 14px 50px rgba(16, 24, 40, 0.35);
+}
+
+/* =========================
+   FORM + INPUT
+========================= */
+.form-control,
+.form-select,
+textarea {
+  background: #fff;
   border: 1px solid #e6eef9;
-  box-shadow: none;
   color: #111827;
 }
 
-/* Footer/Buttons giữ rõ */
-.modal-footer { background: #fff; border-top: 1px solid #eef2f6; }
+/* =========================
+   FOOTER
+========================= */
+.modal-footer {
+  background: #fff;
+  border-top: 1px solid #eef2f6;
+}
 
-/* Một số tweak responsive */
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 992px) {
-  .modal-dialog { max-width: 92%; }
+  .custom-modal-dialog {
+    max-width: 95%;
+  }
+
+  .modal.d-block {
+    padding-top: 80px;
+  }
 }

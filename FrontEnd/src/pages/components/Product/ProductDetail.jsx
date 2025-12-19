@@ -17,10 +17,12 @@ export default function ProductDetail({ product, onEdit, onDelete }) {
     if (v == null || isNaN(Number(v))) return "0";
     return Number(v).toLocaleString();
   };
-
+console.log(product);
+console.log(product.createdAt);
 
 
   return (
+    
     <div className="kv-detail-card" onClick={(e) => e.stopPropagation()}>
       <div className="kv-detail-left">
         <img
@@ -65,12 +67,12 @@ export default function ProductDetail({ product, onEdit, onDelete }) {
 
           <div>
             <div className="label">Trạng thái</div>
-            <div className="value">{product.status || "inactive"}</div>
+            <div className="value">{product.status === "ACTIVE" ? "Kinh doanh": "Ngừng kinh doanh"}</div>
           </div>
 
           <div>
             <div className="label">Ngày tạo</div>
-            <div className="value">{product.createAt || "—"}</div>
+            <div className="value">{product.createdAt || "-"}</div>
           </div>
 
           <div>

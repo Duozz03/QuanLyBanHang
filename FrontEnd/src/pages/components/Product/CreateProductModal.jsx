@@ -1,8 +1,9 @@
 // CreateProductModal.jsx
 import React, { useState } from "react";
 import axios from "axios";
-import "./ShopDashboard.css";
+import "./CreateProductModal.css";
 import "./ShopDashboard.jsx";
+import CreateCategory from "../Category/CreateCategory.jsx";
 
 export default function CreateProductModal({
   open,
@@ -24,12 +25,13 @@ export default function CreateProductModal({
     price: initialProduct?.price != null ? String(initialProduct.price) : "",
     quantity:
       initialProduct?.quantity != null ? String(initialProduct.quantity) : "",
-    status: initialProduct?.status || "ACTIVE", // "active" or "inactive",
+    status: initialProduct?.status || "Kinh Doanh", // "active" or "inactive",
     category: initialProduct?.category || "",
   }));
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(form.urlImage || null);
+  const [OpenCreateCategory, setOpenCreateCategory]= useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,6 +60,8 @@ export default function CreateProductModal({
       alert("Stock quantity phải là số nguyên >= 0.");
       return;
     }
+
+    
 
     // Build product object
     const product = {
@@ -116,6 +120,10 @@ export default function CreateProductModal({
     window.location.reload();
   };
 
+  const openCreate = () => {
+    setOpenCreateCategory(true);
+    };
+
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) {
@@ -123,6 +131,9 @@ export default function CreateProductModal({
       setPreviewUrl(null);
       return;
     }
+
+    
+
 
     // tạo preview
     const url = URL.createObjectURL(file);
@@ -137,15 +148,15 @@ export default function CreateProductModal({
         onClick={(e) => e.stopPropagation()}
         tabIndex="-1"
       >
-        <div className="modal-dialog modal-xl modal-dialog-centered">
+        <div className="modal-dialog modal-xl mt-5 ">
           <div className="modal-content">
             {/* Header */}
             <div className="modal-header align-items-start">
               <div>
-                <h5 className="modal-title mb-1">
+                <h5 className="modal-title">
                   {initialProduct ? "Chỉnh sửa hàng hóa" : "Tạo hàng hóa"}
                 </h5>
-                <small className="text-muted">Thông tin cơ bản sản phẩm</small>
+                
               </div>
 
               <div className="ms-auto">
@@ -158,7 +169,7 @@ export default function CreateProductModal({
             </div>
 
             {/* Tabs */}
-            <div className="px-4 pt-0">
+            <div className="px-4 pt-0 ">
               <ul className="nav nav-tabs custom-tabs" role="tablist">
                 <li className="nav-item" role="presentation">
                   <button
@@ -216,7 +227,7 @@ export default function CreateProductModal({
                             <option value="">Chọn nhóm hàng (Bắt buộc)</option>
                             {/* bạn có thể map options ở đây */}
                           </select>
-                          <button type="button" className="btn btn-link small">
+                          <button type="button" className="btn btn-link small" onClick={openCreate} >
                             Tạo mới
                           </button>
                         </div>
@@ -379,6 +390,8 @@ export default function CreateProductModal({
           </div>
         </div>
       </div>
+      
+      
     </div>
   );
 }

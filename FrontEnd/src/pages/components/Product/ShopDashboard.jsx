@@ -6,7 +6,8 @@ import CreateProductModal from "./CreateProductModal";
 import axios from "axios";
 
 export default function ShopDashboard() {
-  const [active, setActive] = useState("hanghoa");
+  
+  const [searchTerm, setSearchTerm] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
@@ -117,113 +118,17 @@ export default function ShopDashboard() {
       console.error("Xóa thất bại:", err);
     }
   };
+  const filterProduct = products.filter((p) =>{
+    const keyword = searchTerm.toLowerCase().trim();
+    return(
+      p.id?.toString().toLowerCase().includes(keyword) ||
+      p.name?.toLowerCase().includes(keyword)
+    );
+  })
 
   return (
     <div className="kv-app">
-      {/* top thin white bar (kept kv styles) */}
-      <div
-        className="kv-topbar"
-        style={{ background: "linear-gradient(180deg,#fff,#fff)" }}
-      >
-        <div className="container-fluid d-flex align-items-center justify-content-between">
-          <div className="d-flex align-items-center">
-            <div className="kv-brand">
-              <img
-                src="/images/logo.png"
-                alt="logo"
-                style={{
-                  width: 64,
-                  height: 50,
-                  objectFit: "contain",
-                  marginLeft: 0,
-                }}
-              />
-              <div className="kv-brand-text ms-2 text-dark">Deuoz</div>
-            </div>
-          </div>
-
-          <div className="kv-option d-none d-md-flex align-items-center">
-            <div className="kv-top-icons">
-              <div className="kv-icon-item">
-                <i className="fa-solid fa-truck-fast"></i>
-                <span>Giao hàng</span>
-              </div>
-
-              <div className="kv-icon-item">
-                <i className="fa-regular fa-circle"></i>
-                <span>Chủ đề</span>
-              </div>
-
-              <div className="kv-icon-item">
-                <i className="fa-regular fa-message"></i>
-                <span>Hỗ trợ</span>
-              </div>
-
-              <div className="kv-icon-item">
-                <i className="fa-regular fa-comment-dots"></i>
-                <span>Góp ý</span>
-              </div>
-
-              <div className="kv-icon-item">
-                <img
-                  src="https://flagcdn.com/w20/vn.png"
-                  className="kv-flag"
-                  alt="vn"
-                />
-                <span>Tiếng Việt</span>
-              </div>
-
-              <div className="kv-icon-circle">
-                <i className="fa-regular fa-bell"></i>
-              </div>
-
-              <div className="kv-icon-circle">
-                <i className="fa-solid fa-gear"></i>
-              </div>
-
-              <div className="kv-avatar">
-                <img src="https://i.pravatar.cc/40" alt="avatar" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* blue nav strip using kv styles but bootstrap containers */}
-      <header
-        className="kv-topbar"
-        style={{
-          background: "linear-gradient(180deg,var(--blue),var(--blue-strong))",
-          padding: "10px 0",
-        }}
-      >
-        <div className="container-fluid d-flex align-items-center justify-content-between">
-          <nav className="kv-navlinks ">
-            <button
-              className={"kv-link " + (active === "hanghoa" ? "active" : "")}
-              onClick={() => setActive("hanghoa")}
-            >
-              Hàng hóa
-            </button>
-            <button
-              className={"kv-link " + (active === "donhang" ? "active" : "")}
-              onClick={() => setActive("donhang")}
-            >
-              Đơn hàng
-            </button>
-            <button
-              className={"kv-link " + (active === "khachhang" ? "active" : "")}
-              onClick={() => setActive("khachhang")}
-            >
-              Khách hàng
-            </button>
-          </nav>
-
-          <div className="kv-top-right ms-auto ">
-            <button className="kv-pill">Bán hàng</button>
-          </div>
-        </div>
-      </header>
+      
 
       {/* main: use bootstrap container + kv-main grid fallback */}
       <div className="container-fluid">
@@ -250,6 +155,8 @@ export default function ShopDashboard() {
                 <input
                   className="kv-search"
                   placeholder="Tìm theo mã, tên hàng"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <button className="kv-btn" onClick={openCreate}>
                   + Tạo mới
@@ -278,11 +185,11 @@ export default function ShopDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((r) => (
+                    {filterProduct.map((r) => (
                       <React.Fragment key={r.id}>
                         <tr
                           className={
-                            "kv-row " + (expandedId === r.id ? "expanded" : "")
+                            "kv-row" + (expandedId === r.id ? "expanded" : "")
                           }
                           onClick={() => toggleRow(r.id)}
                           style={{ cursor: "pointer" }}
@@ -310,13 +217,15 @@ export default function ShopDashboard() {
                           <td>{r.price}</td>
                           <td>{r.importPrice}</td>
                           <td>{r.quantity}</td>
-                          <td>{r.status}</td>
+                          <td>{r.status === "ACTIVE" ? "Kinh Doanh":"Ngừng Kinh Doanh"}</td>
                           <td>{r.createdAt}</td>
                         </tr>
 
                         {expandedId === r.id && (
                           <tr className="kv-detail-row">
                             <td colSpan={9}>
+
+
                               <ProductDetail
                                 product={r}
                                 onEdit={handleEdit}
