@@ -5,102 +5,57 @@
   import CreateProductModal from "./CreateProductModal";
   import axios from "axios";
 
-  export default function ShopDashboard() {
-    const [active, setActive] = useState("hanghoa");
-    const [expandedId, setExpandedId] = useState(null);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editProduct, setEditProduct] = useState(null);
-    const [products, setProducts] = useState([]);
+export default function ShopDashboard() {
+  const [expandedId, setExpandedId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+  const [products, setProducts] = useState([]);
 
-    useEffect(() => {
-      const loadProducts = async () => {
-        try {
-          const token =
-            localStorage.getItem("accessToken") ||
-            sessionStorage.getItem("accessToken");
+  //search dropdown
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]); // id đã thêm vào bảng tìm kiếm
 
-          const res = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/products`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+  useEffect(() => {
+    const keyword = searchTerm.trim().toLowerCase();
 
-          const data = res.data.result || [];
+    if (!keyword) {
+      setSearchResults([]);
+      return;
+    }
 
-          const urlImage = await Promise.all(
-            data.map(async (p) => {
-              try {
-                const imgRes = await axios.get(
-                  `${import.meta.env.VITE_API_BASE_URL}/products/${p.id}/image`,
-                  { headers: { Authorization: `Bearer ${token}` } }
-                );
-                const base64String = imgRes.data.result;
-                return {
-                  ...p,
-                  urlImage: `data:image/jpeg;base64,${base64String}`,
-                };
-              } catch (e) {
-                return { ...p, urlImage: "/images/product-placeholder.png", e };
-              }
-            })
-          );
+    const results = products
+      .filter(
+        (p) =>
+          p.name?.toLowerCase().includes(keyword) ||
+          p.barcode?.toString().includes(keyword)
+      )
+      .slice(0, 8); // giới hạn 8 dòng giống KiotViet
 
-          setProducts(urlImage);
-        } catch (err) {
-          console.error(err);
-          alert("Lỗi khi tải sản phẩm");
-        }
-      };
+    setSearchResults(results);
+  }, [searchTerm, products]);
 
-      loadProducts();
-    }, []);
+  const handleSelectProduct = (product) => {
+    if (selectedIds.includes(product.id)) return; // 🚫 không thêm trùng
 
-    const toggleRow = (id) => setExpandedId((p) => (p === id ? null : id));
+    setSelectedIds((prev) => [...prev, product.id]);
 
-    const openCreate = () => {
-      setEditProduct(null);
-      setModalOpen(true);
-    };
+    setSearchTerm("");
+    setSearchResults([]);
+  };
+  const removeSelected = (id) => {
+    setSelectedIds((prev) => prev.filter((x) => x !== id));
+  };
 
-    const handleEdit = (product) => {
-      setEditProduct(product);
-      setModalOpen(true);
-    };
+  //Phân trang
+  const [currentPage, setCurrentPage] = useState(1); // reset về trang ban đầu
+  const [pageSize, setPageSize] = useState(10); // số sản phẩm / trang
 
-    const handleSave = (product, isEdit) => {
-      if (isEdit) {
-        setProducts((prev) =>
-          prev.map((p) => (p.id === product.id ? { ...p, ...product } : p))
-        );
-        setModalOpen(false);
-        setExpandedId(product.id);
-        setEditProduct(null);
-      } else {
-        let pid = product.id;
-        if (products.find((p) => p.id === pid)) {
-          pid = pid + "-" + Date.now().toString().slice(-4);
-          product.id = pid;
-        }
-        const toAdd = {
-          id: String(product.id),
-          barcode: product.barcode || "",
-          name: product.name || "",
-          urlImage: product.urlImage,
-          description: product.description || "",
-          importPrice: Number(product.importPrice) || 0,
-          price: Number(product.price) || 0,
-          quantity: Number(product.quantity) || 0,
-          status: product.status || "ACTIVE",
-          category: product.category || "",
-          img: product.img || "",
-        };
-        setProducts((prev) => [...prev, toAdd]);
-        setModalOpen(false);
-        setExpandedId(toAdd.id);
-      }
-      loadProducts();
-    };
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
 
-    const handleDelete = async (product) => {
+  useEffect(() => {
+    const loadProducts = async () => {
       try {
         const token =
             localStorage.getItem("accessToken") ||
@@ -117,146 +72,209 @@
       }
     };
 
-    return (
-      <div className="kv-app">
-        {/* top thin white bar (kept kv styles) */}
-        <div
-          className="kv-topbar"
-          style={{ background: "linear-gradient(180deg,#fff,#fff)" }}
-        >
-          <div className="container-fluid d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center">
-              <div className="kv-brand">
-                <img
-                  src="/images/logo.png"
-                  alt="logo"
-                  style={{
-                    width: 64,
-                    height: 50,
-                    objectFit: "contain",
-                    marginLeft: 0,
-                  }}
-                />
-                <div className="kv-brand-text ms-2 text-dark">Deuoz</div>
-              </div>
+    loadProducts();
+  }, []);
+
+  const toggleRow = (id) => setExpandedId((p) => (p === id ? null : id));
+
+  const openCreate = () => {
+    setEditProduct(null);
+    setModalOpen(true);
+  };
+
+  const handleEdit = (product) => {
+    setEditProduct(product);
+    setModalOpen(true);
+  };
+
+  const handleSave = (product, isEdit) => {
+    if (isEdit) {
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, ...product } : p))
+      );
+      setModalOpen(false);
+      setExpandedId(product.id);
+      setEditProduct(null);
+    } else {
+      let pid = product.id;
+      if (products.find((p) => p.id === pid)) {
+        pid = pid + "-" + Date.now().toString().slice(-4);
+        product.id = pid;
+      }
+      const toAdd = {
+        id: String(product.id),
+        barcode: product.barcode || "",
+        name: product.name || "",
+        urlImage: product.urlImage,
+        description: product.description || "",
+        importPrice: Number(product.importPrice) || 0,
+        price: Number(product.price) || 0,
+        quantity: Number(product.quantity) || 0,
+        status: product.status || "ACTIVE",
+        createdAt: product.createdAt || new Date().slice(0, 10),
+        category: product.category || "",
+        img: product.img || "",
+      };
+      setProducts((prev) => [...prev, toAdd]);
+      setModalOpen(false);
+      setExpandedId(toAdd.id);
+    }
+  };
+
+  const handleDelete = async (product) => {
+    try {
+      const token =
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
+      // gọi API xóa trên backend bằng axios
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/products/${product.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // cập nhật lại state frontend
+      setProducts((prev) => prev.filter((p) => p.id !== product.id));
+    } catch (err) {
+      console.error("Xóa thất bại:", err);
+    }
+  };
+  const displayProducts =
+    selectedIds.length === 0
+      ? products // 👉 chưa chọn gì → hiện tất cả
+      : products.filter((p) => selectedIds.includes(p.id));
+
+  const paginatedProducts = displayProducts.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(displayProducts.length / pageSize);
+
+  return (
+    <div className="kv-app">
+      {/* main: use bootstrap container + kv-main grid fallback */}
+      <div className="container-fluid">
+        <div className="row bm-3" style={{ margin: "0px 100px 0px 100px" }}>
+          <h5 className="col-3 kv-heading-page">
+            <span>Hàng Hóa</span>
+          </h5>
+
+          {/* main table */}
+          <div className="col-9 d-flex align-items-center justify-content-between kv-content-head">
+            <div className="chip-search-wrapper">
+              {selectedIds.map((id) => {
+                const p = products.find((x) => x.id === id);
+                if (!p) return null;
+
+                return (
+                  <span key={id} className="chip">
+                    {p.barcode}
+                    <button onClick={() => removeSelected(id)}>×</button>
+                  </span>
+                );
+              })}
+
+              <input
+                className="chip-input"
+                placeholder="Tìm theo mã, tên hàng"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+
+              {searchResults.length > 0 && (
+                <div className="search-dropdown">
+                  {searchResults.map((p) => (
+                    <div
+                      key={p.id}
+                      className="search-item"
+                      onClick={() => handleSelectProduct(p)}
+                    >
+                      <img src={p.urlImage} alt="" />
+                      <div>
+                        <strong>{p.name}</strong>
+                        <div className="kv-muted">{p.barcode}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="kv-option d-none d-md-flex align-items-center">
-              <div className="kv-top-icons">
-                <div className="kv-icon-item">
-                  <i className="fa-solid fa-truck-fast"></i>
-                  <span>Giao hàng</span>
-                </div>
-
-                <div className="kv-icon-item">
-                  <i className="fa-regular fa-circle"></i>
-                  <span>Chủ đề</span>
-                </div>
-
-                <div className="kv-icon-item">
-                  <i className="fa-regular fa-message"></i>
-                  <span>Hỗ trợ</span>
-                </div>
-
-                <div className="kv-icon-item">
-                  <i className="fa-regular fa-comment-dots"></i>
-                  <span>Góp ý</span>
-                </div>
-
-                <div className="kv-icon-item">
-                  <img
-                    src="https://flagcdn.com/w20/vn.png"
-                    className="kv-flag"
-                    alt="vn"
-                  />
-                  <span>Tiếng Việt</span>
-                </div>
-
-                <div className="kv-icon-circle">
-                  <i className="fa-regular fa-bell"></i>
-                </div>
-
-                <div className="kv-icon-circle">
-                  <i className="fa-solid fa-gear"></i>
-                </div>
-
-                <div className="kv-avatar">
-                  <img src="https://i.pravatar.cc/40" alt="avatar" />
-                </div>
-              </div>
+            <div className="d-flex gap-2">
+              <button className="kv-btn ml-5" onClick={openCreate}>
+                + Tạo mới
+              </button>
+              <button className="kv-btn">Import file</button>
+              <button className="kv-btn">Xuất file</button>
             </div>
           </div>
         </div>
 
-        {/* blue nav strip using kv styles but bootstrap containers */}
-        <header
-          className="kv-topbar"
-          style={{
-            background: "linear-gradient(180deg,var(--blue),var(--blue-strong))",
-            padding: "10px 0",
-          }}
-        >
-          <div className="container-fluid d-flex align-items-center justify-content-between">
-            <nav className="kv-navlinks ">
-              <button
-                className={"kv-link " + (active === "hanghoa" ? "active" : "")}
-                onClick={() => setActive("hanghoa")}
-              >
-                Hàng hóa
-              </button>
-              <button
-                className={"kv-link " + (active === "donhang" ? "active" : "")}
-                onClick={() => setActive("donhang")}
-              >
-                Đơn hàng
-              </button>
-              <button
-                className={"kv-link " + (active === "khachhang" ? "active" : "")}
-                onClick={() => setActive("khachhang")}
-              >
-                Khách hàng
-              </button>
-            </nav>
-
-            <div className="kv-top-right ms-auto ">
-              <button className="kv-pill">Bán hàng</button>
+        <div className="row gx-4" style={{ margin: "0 100px" }}>
+          {/* ⬅ Sidebar */}
+          <aside className="col-12 col-lg-3">
+            <div className="kv-panel">
+              <h4 className="kv-panel-title">Bộ lọc</h4>
+              <input className="kv-input" placeholder="Tìm nhóm..." />
             </div>
           </div>
         </header>
 
-        {/* main: use bootstrap container + kv-main grid fallback */}
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-12">
-              {/* spacing between nav and content */}
-              <div style={{ height: 12 }} />
-            </div>
-          </div>
-
-          <div className="row gx-4" style={{ margin: "0 100px" }}>
-            {/* left sidebar (uses kv-panel) */}
-            <aside className="col-12 col-lg-3">
-              <div className="kv-panel">
-                <h4 className="kv-panel-title">Bộ lọc</h4>
-                <input className="kv-input" placeholder="Tìm nhóm..." />
-              </div>
-            </aside>
-
-            {/* main table */}
-            <section className="col-12 col-lg-6">
-              <div className="d-flex align-items-center justify-content-between mb-3 kv-content-head">
-                <div className="kv-actions">
-                  <input
-                    className="kv-search"
-                    placeholder="Tìm theo mã, tên hàng"
-                  />
-                  <button className="kv-btn" onClick={openCreate}>
-                    + Tạo mới
-                  </button>
-                  <button className="kv-btn">Import file</button>
-                  <button className="kv-btn">Xuất file</button>
-                </div>
-              </div>
+          <div className="col-12 col-lg-9">
+            <div className="kv-table-container">
+              <div className="kv-table-wrap">
+                <table className="table kv-table mb-0">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 34 }}>
+                        <input type="checkbox" />
+                      </th>
+                      <th>Ảnh</th>
+                      <th>Mã hàng</th>
+                      <th>Tên hàng</th>
+                      <th>Giá bán</th>
+                      <th>Giá nhập</th>
+                      <th>Tồn kho</th>
+                      <th>Trạng thái</th>
+                      <th>Ngày tạo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedProducts.map((r) => (
+                      <React.Fragment key={r.id}>
+                        <tr
+                          className={
+                            "kv-row" + (expandedId === r.id ? "expanded" : "")
+                          }
+                          onClick={() => toggleRow(r.id)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <td>
+                            <input
+                              type="checkbox"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </td>
+                          <td>
+                            <img
+                              src={r.urlImage || "/images/placeholder.png"}
+                              alt=""
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: 6,
+                                objectFit: "cover",
+                              }}
+                            />
+                          </td>
+                          <td>{r.id}</td>
+                          <td>{r.name}</td>
+                          <td>{r.price}</td>
+                          <td>{r.importPrice}</td>
+                          <td>{r.quantity}</td>
+                          <td>
+                            {r.status === "ACTIVE"
+                              ? "Kinh Doanh"
+                              : "Ngừng Kinh Doanh"}
+                          </td>
+                          <td>{r.createdAt}</td>
+                        </tr>
 
               <div className="kv-table-wrap">
                 <div className="table-responsive">
@@ -338,17 +356,38 @@
                   </table>
                 </div>
               </div>
-            </section>
+              <div className="phantran mt-2 d-flex gap-3">
+                <select className="option"
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1); // reset về trang đầu
+                  }}
+                >
+                  <option value={5}>5 / trang</option>
+                  <option value={10}>10 / trang</option>
+                  <option value={20}>20 / trang</option>
+                  <option value={50}>50 / trang</option>
+                </select>
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                >
+                  ◀ Trước
+                </button>
 
-            {/* right suggestion */}
-            <aside className="col-12 col-lg-3">
-              <div className="kv-card-small">
-                <h5>Gợi ý</h5>
-                <p className="kv-muted">
-                  Sử dụng bộ lọc bên trái để tìm nhanh hàng hóa.
-                </p>
+                <span>
+                  Trang {currentPage} / {totalPages}
+                </span>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  Sau ▶
+                </button>
               </div>
-            </aside>
+            </div>
           </div>
         </div>
 
