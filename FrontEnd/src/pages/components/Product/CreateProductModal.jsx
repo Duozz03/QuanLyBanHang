@@ -96,7 +96,6 @@ const handleSave = async (e) => {
     console.error("Lỗi khi gửi dữ liệu:", err);
     alert("Gửi dữ liệu thất bại: " + err.message);
   }
-
 };
 
 const handleImageChange = (e) => {
