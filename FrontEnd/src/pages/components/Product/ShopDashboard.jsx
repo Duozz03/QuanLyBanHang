@@ -6,12 +6,53 @@ import CreateProductModal from "./CreateProductModal";
 import axios from "axios";
 
 export default function ShopDashboard() {
-  
-  const [searchTerm, setSearchTerm] = useState("");
   const [expandedId, setExpandedId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [products, setProducts] = useState([]);
+
+  //search dropdown
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]); // id đã thêm vào bảng tìm kiếm
+
+  useEffect(() => {
+    const keyword = searchTerm.trim().toLowerCase();
+
+    if (!keyword) {
+      setSearchResults([]);
+      return;
+    }
+
+    const results = products
+      .filter(
+        (p) =>
+          p.name?.toLowerCase().includes(keyword) ||
+          p.barcode?.toString().includes(keyword)
+      )
+      .slice(0, 8); // giới hạn 8 dòng giống KiotViet
+
+    setSearchResults(results);
+  }, [searchTerm, products]);
+
+  const handleSelectProduct = (product) => {
+    if (selectedIds.includes(product.id)) return; // 🚫 không thêm trùng
+
+    setSelectedIds((prev) => [...prev, product.id]);
+
+    setSearchTerm("");
+    setSearchResults([]);
+  };
+  const removeSelected = (id) => {
+    setSelectedIds((prev) => prev.filter((x) => x !== id));
+  };
+
+  //Phân trang
+  const [currentPage, setCurrentPage] = useState(1); // reset về trang ban đầu
+  const [pageSize, setPageSize] = useState(10); // số sản phẩm / trang
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -118,29 +159,76 @@ export default function ShopDashboard() {
       console.error("Xóa thất bại:", err);
     }
   };
-  const filterProduct = products.filter((p) =>{
-    const keyword = searchTerm.toLowerCase().trim();
-    return(
-      p.id?.toString().toLowerCase().includes(keyword) ||
-      p.name?.toLowerCase().includes(keyword)
-    );
-  })
+  const displayProducts =
+    selectedIds.length === 0
+      ? products // 👉 chưa chọn gì → hiện tất cả
+      : products.filter((p) => selectedIds.includes(p.id));
+
+  const paginatedProducts = displayProducts.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(displayProducts.length / pageSize);
 
   return (
     <div className="kv-app">
-      
-
       {/* main: use bootstrap container + kv-main grid fallback */}
       <div className="container-fluid">
-        <div className="row">
-          <div className="col-12">
-            {/* spacing between nav and content */}
-            <div style={{ height: 12 }} />
+        <div className="row bm-3" style={{ margin: "0px 100px 0px 100px" }}>
+          <h5 className="col-3 kv-heading-page">
+            <span>Hàng Hóa</span>
+          </h5>
+
+          {/* main table */}
+          <div className="col-9 d-flex align-items-center justify-content-between kv-content-head">
+            <div className="chip-search-wrapper">
+              {selectedIds.map((id) => {
+                const p = products.find((x) => x.id === id);
+                if (!p) return null;
+
+                return (
+                  <span key={id} className="chip">
+                    {p.barcode}
+                    <button onClick={() => removeSelected(id)}>×</button>
+                  </span>
+                );
+              })}
+
+              <input
+                className="chip-input"
+                placeholder="Tìm theo mã, tên hàng"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+
+              {searchResults.length > 0 && (
+                <div className="search-dropdown">
+                  {searchResults.map((p) => (
+                    <div
+                      key={p.id}
+                      className="search-item"
+                      onClick={() => handleSelectProduct(p)}
+                    >
+                      <img src={p.urlImage} alt="" />
+                      <div>
+                        <strong>{p.name}</strong>
+                        <div className="kv-muted">{p.barcode}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="d-flex gap-2">
+              <button className="kv-btn ml-5" onClick={openCreate}>
+                + Tạo mới
+              </button>
+              <button className="kv-btn">Import file</button>
+              <button className="kv-btn">Xuất file</button>
+            </div>
           </div>
         </div>
 
         <div className="row gx-4" style={{ margin: "0 100px" }}>
-          {/* left sidebar (uses kv-panel) */}
+          {/* ⬅ Sidebar */}
           <aside className="col-12 col-lg-3">
             <div className="kv-panel">
               <h4 className="kv-panel-title">Bộ lọc</h4>
@@ -148,26 +236,9 @@ export default function ShopDashboard() {
             </div>
           </aside>
 
-          {/* main table */}
-          <section className="col-12 col-lg-6">
-            <div className="d-flex align-items-center justify-content-between mb-3 kv-content-head">
-              <div className="kv-actions">
-                <input
-                  className="kv-search"
-                  placeholder="Tìm theo mã, tên hàng"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button className="kv-btn" onClick={openCreate}>
-                  + Tạo mới
-                </button>
-                <button className="kv-btn">Import file</button>
-                <button className="kv-btn">Xuất file</button>
-              </div>
-            </div>
-
-            <div className="kv-table-wrap">
-              <div className="table-responsive">
+          <div className="col-12 col-lg-9">
+            <div className="kv-table-container">
+              <div className="kv-table-wrap">
                 <table className="table kv-table mb-0">
                   <thead>
                     <tr>
@@ -185,7 +256,7 @@ export default function ShopDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filterProduct.map((r) => (
+                    {paginatedProducts.map((r) => (
                       <React.Fragment key={r.id}>
                         <tr
                           className={
@@ -217,15 +288,17 @@ export default function ShopDashboard() {
                           <td>{r.price}</td>
                           <td>{r.importPrice}</td>
                           <td>{r.quantity}</td>
-                          <td>{r.status === "ACTIVE" ? "Kinh Doanh":"Ngừng Kinh Doanh"}</td>
+                          <td>
+                            {r.status === "ACTIVE"
+                              ? "Kinh Doanh"
+                              : "Ngừng Kinh Doanh"}
+                          </td>
                           <td>{r.createdAt}</td>
                         </tr>
 
                         {expandedId === r.id && (
                           <tr className="kv-detail-row">
                             <td colSpan={9}>
-
-
                               <ProductDetail
                                 product={r}
                                 onEdit={handleEdit}
@@ -247,18 +320,39 @@ export default function ShopDashboard() {
                   </tbody>
                 </table>
               </div>
-            </div>
-          </section>
+              <div className="phantran mt-2 d-flex gap-3">
+                <select className="option"
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1); // reset về trang đầu
+                  }}
+                >
+                  <option value={5}>5 / trang</option>
+                  <option value={10}>10 / trang</option>
+                  <option value={20}>20 / trang</option>
+                  <option value={50}>50 / trang</option>
+                </select>
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                >
+                  ◀ Trước
+                </button>
 
-          {/* right suggestion */}
-          <aside className="col-12 col-lg-3">
-            <div className="kv-card-small">
-              <h5>Gợi ý</h5>
-              <p className="kv-muted">
-                Sử dụng bộ lọc bên trái để tìm nhanh hàng hóa.
-              </p>
+                <span>
+                  Trang {currentPage} / {totalPages}
+                </span>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  Sau ▶
+                </button>
+              </div>
             </div>
-          </aside>
+          </div>
         </div>
       </div>
 

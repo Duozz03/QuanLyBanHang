@@ -11,23 +11,20 @@
 
 /* ===== Top white bar ===== */
 .kv-topbar{
+  position: fixed;     /* 🔥 CỐ ĐỊNH TUYỆT ĐỐI */
+  left: 0;
   width: 100%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 8px 18px;
-  box-shadow: 0 2px 6px rgba(10,10,10,0.08);
-  position: sticky;
-  top: 0;
-  z-index: 2000;
-  pointer-events: auto;
+  z-index: 3000;
 }
 
 /* topbar white version */
 .kv-topbar.bg-white{
   background: #ffffff;
   color: #111827;
+  top: 0;
+  height: 56px;
 }
+
 
 /* ===== Brand ===== */
 .kv-brand{
@@ -113,8 +110,11 @@
 .kv-topbar.kv-blue{
   background: linear-gradient(180deg,var(--blue),var(--blue-strong));
   color:#fff;
-  padding: 10px 18px;
+  top: 56px;
+  height: 52px;
 }
+
+
 
 /* nav links */
 .kv-navlinks{
@@ -181,3 +181,4 @@
   .kv-top-right{ margin-right:20px; }
   .kv-option{ display:none; }
 }
+

@@ -8,8 +8,8 @@ export default function Header() {
       {/* Top white bar */}
       <div className="kv-topbar bg-white">
         <div className="container-fluid d-flex justify-content-between align-items-center">
-          <div className="kv-brand d-flex align-items-center">
-            <img src="/images/logo.png" alt="logo" width={64} />
+          <div className="mobileMenu kv-btn kv-btn-icon-only kv-btn-text-primary">
+            <img src="/images/logo.png" alt="logo" width={64} height={48} />
             <span className="ms-2 fw-bold">Deuoz</span>
           </div>
 

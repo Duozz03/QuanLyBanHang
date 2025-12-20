@@ -1,0 +1,12 @@
+/* body KHÔNG scroll */
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+/* vùng content scroll */
+.kv-content-wrapper {
+  height: calc(100vh - 108px); /* 56 + 52 */
+  overflow-y: auto;
+  background: #f5f7fa;
+}

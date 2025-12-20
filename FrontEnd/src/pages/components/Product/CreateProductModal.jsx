@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./CreateProductModal.css";
 import "./ShopDashboard.jsx";
-import CreateCategory from "../Category/CreateCategory.jsx";
+import CreateCategoryModal from "../Category/CreateCategory";
 
 export default function CreateProductModal({
   open,
@@ -13,6 +13,7 @@ export default function CreateProductModal({
 }) {
   // init form once from initialProduct (no effect on later updates)
 
+  const [openCreateCategory, setOpenCreateCategory] = useState(false);
   const [form, setForm] = useState(() => ({
     barcode: initialProduct?.barcode || "",
     name: initialProduct?.name || "",
@@ -25,13 +26,14 @@ export default function CreateProductModal({
     price: initialProduct?.price != null ? String(initialProduct.price) : "",
     quantity:
       initialProduct?.quantity != null ? String(initialProduct.quantity) : "",
-    status: initialProduct?.status || "Kinh Doanh", // "active" or "inactive",
+    status: initialProduct?.status || "0", // "active" or "inactive",
     category: initialProduct?.category || "",
   }));
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(form.urlImage || null);
-  const [OpenCreateCategory, setOpenCreateCategory]= useState(false);
+  //
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,7 +74,7 @@ export default function CreateProductModal({
       price: salePriceNum,
       quantity: stockNum,
       status: form.status,
-      category: form.category.trim(),
+      category: form.category,
     };
 
     const isEdit = !!initialProduct;
@@ -120,10 +122,7 @@ export default function CreateProductModal({
     window.location.reload();
   };
 
-  const openCreate = () => {
-    setOpenCreateCategory(true);
-    };
-
+  
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) {
@@ -142,6 +141,7 @@ export default function CreateProductModal({
   };
 
   return (
+    <>
     <div className="modal-backdrop custom-backdrop" onClick={onClose}>
       <div
         className="modal d-block"
@@ -227,7 +227,8 @@ export default function CreateProductModal({
                             <option value="">Chọn nhóm hàng (Bắt buộc)</option>
                             {/* bạn có thể map options ở đây */}
                           </select>
-                          <button type="button" className="btn btn-link small" onClick={openCreate} >
+                          
+                          <button type="button" className="btn btn-link small"  onClick={() => setOpenCreateCategory(true)} >
                             Tạo mới
                           </button>
                         </div>
@@ -390,8 +391,17 @@ export default function CreateProductModal({
           </div>
         </div>
       </div>
-      
-      
     </div>
+    {/* ===== MODAL CON: THÊM NHÓM HÀNG ===== */}
+    <CreateCategoryModal
+      open={openCreateCategory}
+      onClose={() => setOpenCreateCategory(false)}
+      onSave={(category) => {
+        console.log("Category mới:", category);
+        // TODO: gọi API POST /categories
+        // TODO: load lại danh sách category cho select
+      }}
+    />
+    </>
   );
 }
