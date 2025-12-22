@@ -9,9 +9,9 @@
 
 /* Page base */
 .kv-app{
-  min-height: 86dvh;
+  /* min-height: 86dvh;
   background:var(--bg);
-  color:#111827;
+  color:#111827; */
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
 }
@@ -294,9 +294,57 @@ thead{
   background-color: #87a6d5;
 }
 
-.phantran{
+/*CSS PHAAN TRANG*/
+.pagination-bar {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 8px 12px;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
 }
+
+.pagination-bar select {
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.pagination-bar button {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pagination-bar button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-bar .center {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.page-number {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+}
+
+.pagination-bar .left,
+.pagination-bar .right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 
 .search-dropdown {
   position: absolute;
