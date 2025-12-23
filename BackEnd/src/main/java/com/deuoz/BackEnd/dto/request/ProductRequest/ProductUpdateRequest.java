@@ -1,10 +1,10 @@
 package com.deuoz.BackEnd.dto.request.ProductRequest;
 
 import com.deuoz.BackEnd.Enum.Status;
+import com.deuoz.BackEnd.entity.Category;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
+// lam HDPE thi ngon luon
 
 @Data
 @Builder
@@ -19,5 +19,5 @@ public class ProductUpdateRequest {
     double importPrice;
     int quantity;
     Status status;
-    String category;
+    Long categoryId;
 }

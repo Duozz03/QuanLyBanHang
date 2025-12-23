@@ -27,6 +27,7 @@ import java.util.StringJoiner;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+// lam HDPE thi ngon luon
 public class AuthenticationService {
     UserRepository userRepository;
 

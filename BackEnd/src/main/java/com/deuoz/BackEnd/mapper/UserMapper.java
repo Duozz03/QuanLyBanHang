@@ -6,7 +6,7 @@ import com.deuoz.BackEnd.dto.response.UserResponse;
 import com.deuoz.BackEnd.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-
+// lam HDPE thi ngon luon
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     User toUser(UserCreationRequest request);
