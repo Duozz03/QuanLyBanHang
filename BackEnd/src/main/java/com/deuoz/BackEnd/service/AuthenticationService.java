@@ -58,7 +58,7 @@ public class AuthenticationService {
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
-                .issuer("devteria.com")
+                .issuer("quanlybanhang.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
@@ -81,8 +81,8 @@ public class AuthenticationService {
 
     private String buildScope(User user) {
         String stringJoiner = " ";
-        if (user.getRoles() != null) {
-            stringJoiner = user.getRoles().toString();
+        if (user.getRole() != null) {
+            stringJoiner = user.getRole().toString();
 
         }
         return stringJoiner;

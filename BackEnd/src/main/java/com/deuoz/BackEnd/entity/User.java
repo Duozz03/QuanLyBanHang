@@ -30,5 +30,5 @@ public class User {
     String email;
     Date create_at;
     Status status;
-    Role roles;
+    Role role;
 }

@@ -60,4 +60,12 @@ public class UserService {
         );
         return userMapper.toUserResponse(user);
     }
+    public List<UserResponse> getAllUser(){
+        return userRepository.findAll().stream()
+                .map(userMapper::toUserResponse)
+                .toList();
+    }
+    public void delete(Long id){
+        userRepository.deleteById(id);
+    }
 }
