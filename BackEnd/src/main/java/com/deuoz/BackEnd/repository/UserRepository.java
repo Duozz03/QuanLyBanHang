@@ -5,7 +5,7 @@
     import org.springframework.stereotype.Repository;
 
     import java.util.Optional;
-    // lam HDPE thi ngon luon
+
     @Repository
     public interface UserRepository extends JpaRepository<User,Long>{
         boolean existsByUsername(String username);

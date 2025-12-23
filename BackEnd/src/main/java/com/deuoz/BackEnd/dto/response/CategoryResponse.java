@@ -1,12 +1,9 @@
 package com.deuoz.BackEnd.dto.response;
 
-import com.deuoz.BackEnd.entity.Category;
-import com.deuoz.BackEnd.entity.Product;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
-// lam HDPE thi ngon luon
 
 @Getter
 @Setter

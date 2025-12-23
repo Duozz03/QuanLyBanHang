@@ -4,13 +4,12 @@ import com.deuoz.BackEnd.dto.request.CategoryRequest.CategoryCreationRequest;
 import com.deuoz.BackEnd.dto.request.CategoryRequest.CategoryUpdateRequest;
 import com.deuoz.BackEnd.dto.response.CategoryResponse;
 import com.deuoz.BackEnd.entity.Category;
-import org.hibernate.boot.internal.Target;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
-// lam HDPE thi ngon luon
+
 @Mapper(componentModel = "spring",uses = ProductMapper.class)
 public interface CategoryMapper {
     @Mapping(target = "id", ignore = true)

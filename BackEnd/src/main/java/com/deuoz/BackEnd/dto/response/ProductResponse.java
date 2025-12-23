@@ -1,13 +1,9 @@
 package com.deuoz.BackEnd.dto.response;
 
 import com.deuoz.BackEnd.Enum.Status;
-import com.deuoz.BackEnd.entity.Category;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDate;
-import java.util.Date;
-// lam HDPE thi ngon luon
 
 @Data
 @Builder

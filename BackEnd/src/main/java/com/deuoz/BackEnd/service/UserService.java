@@ -1,6 +1,5 @@
 package com.deuoz.BackEnd.service;
 
-import com.deuoz.BackEnd.Enum.Role;
 import com.deuoz.BackEnd.dto.request.UserRequest.UserCreationRequest;
 import com.deuoz.BackEnd.dto.request.UserRequest.UserUpdateRequest;
 import com.deuoz.BackEnd.dto.response.UserResponse;
@@ -15,14 +14,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal=true)
 @Slf4j
-// lam HDPE thi ngon luon
+
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
