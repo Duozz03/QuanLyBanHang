@@ -1,9 +1,9 @@
-  // ShopDashboard.jsx
-  import React, { useEffect, useState } from "react";
-  import "./ShopDashboard.css"; // giữ file CSS tuỳ chỉnh
-  import ProductDetail from "./ProductDetail";
-  import CreateProductModal from "./CreateProductModal";
-  import axios from "axios";
+// ShopDashboard.jsx
+import React, { useEffect, useState } from "react";
+import "./ShopDashboard.css"; // giữ file CSS tuỳ chỉnh
+import ProductDetail from "./ProductDetail";
+import CreateProductModal from "./CreateProductModal";
+import axios from "axios";
 
 export default function ShopDashboard() {
   const [expandedId, setExpandedId] = useState(null);
@@ -58,17 +58,38 @@ export default function ShopDashboard() {
     const loadProducts = async () => {
       try {
         const token =
-            localStorage.getItem("accessToken") ||
-            sessionStorage.getItem("accessToken");
-        // gọi API xóa trên backend bằng axios
-        await axios.delete( `${import.meta.env.VITE_API_BASE_URL}/products/${product.id}`,
-                  { headers: { Authorization: `Bearer ${token}` } }
-                );
+          localStorage.getItem("accessToken") ||
+          sessionStorage.getItem("accessToken");
 
-        // cập nhật lại state frontend
-        setProducts((prev) => prev.filter((p) => p.id !== product.id));
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/products`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const data = res.data.result || [];
+
+        const urlImage = await Promise.all(
+          data.map(async (p) => {
+            try {
+              const imgRes = await axios.get(
+                `${import.meta.env.VITE_API_BASE_URL}/products/${p.id}/image`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              const base64String = imgRes.data.result;
+              return {
+                ...p,
+                urlImage: `data:image/jpeg;base64,${base64String}`,
+              };
+            } catch (e) {
+              return { ...p, urlImage: "/images/product-placeholder.png", e };
+            }
+          })
+        );
+
+        setProducts(urlImage);
       } catch (err) {
-        console.error("Xóa thất bại:", err);
+        console.error(err);
+        alert("Lỗi khi tải sản phẩm");
       }
     };
 
@@ -88,37 +109,59 @@ export default function ShopDashboard() {
   };
 
   const handleSave = (product, isEdit) => {
+    if (!product) return;
+
+    // Chuẩn hoá dữ liệu đầu vào từ backend
+    const normalized = {
+      ...product,
+      id: String(product.id),
+      barcode: product.barcode ?? "",
+      name: product.name ?? "",
+      description: product.description ?? "",
+      importPrice: Number(product.importPrice) || 0,
+      price: Number(product.price) || 0,
+      quantity: Number(product.quantity) || 0,
+      status: product.status || "ACTIVE",
+      category: product.category || "",
+      // FIX: Date object không slice được
+      createdAt: product.createdAt || new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+      // ảnh: nếu backend chưa trả urlImage thì dùng placeholder
+      urlImage: product.urlImage || "/images/product-placeholder.png",
+    };
+
     if (isEdit) {
       setProducts((prev) =>
-        prev.map((p) => (p.id === product.id ? { ...p, ...product } : p))
+        prev.map((p) =>
+          String(p.id) === String(normalized.id)
+            ? {
+                ...p,
+                ...normalized,
+                // nếu backend không trả urlImage, giữ urlImage cũ
+                urlImage: normalized.urlImage || p.urlImage,
+              }
+            : p
+        )
       );
+
       setModalOpen(false);
-      setExpandedId(product.id);
+      setExpandedId(normalized.id);
       setEditProduct(null);
-    } else {
-      let pid = product.id;
-      if (products.find((p) => p.id === pid)) {
-        pid = pid + "-" + Date.now().toString().slice(-4);
-        product.id = pid;
-      }
-      const toAdd = {
-        id: String(product.id),
-        barcode: product.barcode || "",
-        name: product.name || "",
-        urlImage: product.urlImage,
-        description: product.description || "",
-        importPrice: Number(product.importPrice) || 0,
-        price: Number(product.price) || 0,
-        quantity: Number(product.quantity) || 0,
-        status: product.status || "ACTIVE",
-        createdAt: product.createdAt || new Date().slice(0, 10),
-        category: product.category || "",
-        img: product.img || "",
-      };
-      setProducts((prev) => [...prev, toAdd]);
-      setModalOpen(false);
-      setExpandedId(toAdd.id);
+      return;
     }
+
+    // CREATE
+    setProducts((prev) => {
+      // tránh trùng id (hiếm khi xảy ra nếu backend sinh id chuẩn)
+      const exists = prev.some((p) => String(p.id) === String(normalized.id));
+      const finalProduct = exists
+        ? { ...normalized, id: `${normalized.id}-${Date.now()}` }
+        : normalized;
+
+      return [...prev, finalProduct];
+    });
+
+    setModalOpen(false);
+    setExpandedId(normalized.id);
   };
 
   const handleDelete = async (product) => {
@@ -213,8 +256,7 @@ export default function ShopDashboard() {
               <h4 className="kv-panel-title">Bộ lọc</h4>
               <input className="kv-input" placeholder="Tìm nhóm..." />
             </div>
-          </div>
-        </header>
+          </aside>
 
           <div className="col-12 col-lg-9">
             <div className="kv-table-container">
@@ -276,88 +318,33 @@ export default function ShopDashboard() {
                           <td>{r.createdAt}</td>
                         </tr>
 
-              <div className="kv-table-wrap">
-                <div className="table-responsive">
-                  <table className="table kv-table mb-0">
-                    <thead>
-                      <tr>
-                        <th style={{ width: 34 }}>
-                          <input type="checkbox" />
-                        </th>
-                        <th>Ảnh</th>
-                        <th>Mã hàng</th>
-                        <th>Tên hàng</th>
-                        <th>Giá bán</th>
-                        <th>Giá nhập</th>
-                        <th>Tồn kho</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày tạo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((r) => (
-                        <React.Fragment key={r.id}>
-                          <tr
-                            className={
-                              "kv-row " + (expandedId === r.id ? "expanded" : "")
-                            }
-                            onClick={() => toggleRow(r.id)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <td>
-                              <input
-                                type="checkbox"
-                                onClick={(e) => e.stopPropagation()}
+                        {expandedId === r.id && (
+                          <tr className="kv-detail-row">
+                            <td colSpan={9}>
+                              <ProductDetail
+                                product={r}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
                               />
                             </td>
-                            <td>
-                              <img
-                                src={r.urlImage || "/images/placeholder.png"}
-                                alt=""
-                                style={{
-                                  width: 28,
-                                  height: 28,
-                                  borderRadius: 6,
-                                  objectFit: "cover",
-                                }}
-                              />
-                            </td>
-                            <td>{r.id}</td>
-                            <td>{r.name}</td>
-                            <td>{r.price}</td>
-                            <td>{r.importPrice}</td>
-                            <td>{r.quantity}</td>
-                            <td>{r.status}</td>
-                            <td>{r.createdAt}</td>
                           </tr>
+                        )}
+                      </React.Fragment>
+                    ))}
 
-                          {expandedId === r.id && (
-                            <tr className="kv-detail-row">
-                              <td colSpan={9}>
-                                <ProductDetail
-                                  product={r}
-                                  onEdit={handleEdit}
-                                  onDelete={handleDelete}
-                                />
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      ))}
-
-                      {products.length === 0 && (
-                        <tr>
-                          <td colSpan={9} className="text-center p-4 muted">
-                            Không có sản phẩm
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                    {products.length === 0 && (
+                      <tr>
+                        <td colSpan={9} className="text-center p-4 muted">
+                          Không có sản phẩm
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
               <div className="phantran mt-2 d-flex gap-3">
-                <select className="option"
+                <select
+                  className="option"
                   value={pageSize}
                   onChange={(e) => {
                     setPageSize(Number(e.target.value));
@@ -390,20 +377,21 @@ export default function ShopDashboard() {
             </div>
           </div>
         </div>
-
-        <div className="kv-footer">© 2025 Dauoz — Demo dashboard</div>
-
-        {/* CreateProductModal (giữ component hiện tại) */}
-        <CreateProductModal
-          key={editProduct ? editProduct.id : "new"}
-          open={modalOpen}
-          onClose={() => {
-            setModalOpen(false);
-            setEditProduct(null);
-          }}
-          onSave={handleSave}
-          initialProduct={editProduct}
-        />
       </div>
-    );
-  }
+
+      <div className="kv-footer">© 2025 Dauoz — Demo dashboard</div>
+
+      {/* CreateProductModal (giữ component hiện tại) */}
+      <CreateProductModal
+        key={editProduct ? editProduct.id : "new"}
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditProduct(null);
+        }}
+        onSave={handleSave}
+        initialProduct={editProduct}
+      />
+    </div>
+  );
+}
