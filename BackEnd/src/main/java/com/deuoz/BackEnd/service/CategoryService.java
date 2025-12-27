@@ -70,7 +70,7 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll().stream()
+        return categoryRepository.findByParentIsNull().stream()
                 .map(categoryMapper::toCategoryResponse)
                 .toList();
     }
