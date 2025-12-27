@@ -90,7 +90,6 @@ function flattenTree(nodes, level = 0, result = []) {
   return result;
 }
 
-// const getMockId = () => mockAutoId++;
 
 
 const validateCreateCategory = () => {

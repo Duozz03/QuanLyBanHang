@@ -1,30 +1,4 @@
 
-// import React, {useState } from "react";
-// export default function CreateCategory(open, onClose) {
-
-//     const [categorys, setcategorys] = useState([]);
-//     const SaveCategory = (category) =>{
-//         let pid = category.id;
-// if (categorys.find((p) => p.id === pid)) {   
-//   pid = pid + "-" + Date.now().toString().slice(-4);
-//   category.id = pid;
-// }
-// const toAdd= {
-//     id: String(category.id),
-//     name: category.name || "",
-//     parentId: category.parentId || null,
-// };
-// setcategorys((prev) => [...prev, toAdd]);
-
-//     }
-//     return(
-        
-
-
-
-//     );
-// }
-// CreateCategoryModal.jsx
 import React, { useState } from "react";
 
 export default function CreateCategoryModal({ open, onClose, onSave }) {

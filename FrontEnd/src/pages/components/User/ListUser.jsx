@@ -4,31 +4,31 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ListUser.css"; // giữ file CSS tuỳ chỉnh
 export default function ListUser() {
-    const [user, setUser] = useState([]);
+  const [user, setUser] = useState([]);
 
-  
-const loadUser = async () => {
-    try{
-      const token = 
-      localStorage.getItem("accessToken") ||
-       sessionStorage.getItem("accessToken");
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const token =
+          localStorage.getItem("accessToken") ||
+          sessionStorage.getItem("accessToken");
 
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/users`,
-         { headers:{ Authorization: `Bearer ${token}` }  } 
-      );
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/users`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         const data = res.data.result || [];
         console.log("data", data);
-      
-      setUser(data);  
-    } catch (err){
-      console.error(err);
-      alert("Lỗi khi tải User");
-    }
-  };
-useEffect(() => {
-  loadUser();
-}, []);
+
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+        alert("Lỗi khi tải User");
+      }
+    };
+
+    loadUser();
+  }, []);
 
   return (
     <div className="kv-app">
@@ -42,20 +42,11 @@ useEffect(() => {
           {/* main table */}
           <div className="col-9 d-flex align-items-center justify-content-between kv-content-head">
             <div className="chip-search-wrapper">
-              
-
-              <input
-               
-              />
-
-              
+              <input />
             </div>
 
             <div className="d-flex gap-2">
-              <button className="kv-btn ml-5" >
-                + Nhân viên
-              </button>
-              
+              <button className="kv-btn ml-5">+ Nhân viên</button>
             </div>
           </div>
         </div>
@@ -89,33 +80,31 @@ useEffect(() => {
                   </thead>
                   <tbody>
                     {user.map((r) => (
-                                          <React.Fragment key={r.id}>
-                                            <tr
-                                            //   className={
-                                            //     "kv-row" + (expandedId === r.id ? "expanded" : "")
-                                            //   }
-                                            //   onClick={() => toggleRow(r.id)}
-                                            //   style={{ cursor: "pointer" }}
-                                            >
-                                              <td>
-                                                <input
-                                                  type="checkbox"
-                                                  onClick={(e) => e.stopPropagation()}
-                                                />
-                                              </td>
-                                              
-                                              <td>{r.username}</td>  
-                                              <td>{r.fullName}</td>
-                                              <td>{r.address}</td>
-                                              <td>{r.email}</td>
-                                              <td>{r.status}</td>
-                                              <td>
-                                                {r.role}
-                                              </td>
-                                            <td>{r.createdAt}</td>
-                                            </tr>
-                    
-                                            {/* {expandedId === r.id && (
+                      <React.Fragment key={r.id}>
+                        <tr
+                        //   className={
+                        //     "kv-row" + (expandedId === r.id ? "expanded" : "")
+                        //   }
+                        //   onClick={() => toggleRow(r.id)}
+                        //   style={{ cursor: "pointer" }}
+                        >
+                          <td>
+                            <input
+                              type="checkbox"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </td>
+
+                          <td>{r.username}</td>
+                          <td>{r.fullName}</td>
+                          <td>{r.address}</td>
+                          <td>{r.email}</td>
+                          <td>{r.status}</td>
+                          <td>{r.role}</td>
+                          <td>{r.createdAt}</td>
+                        </tr>
+
+                        {/* {expandedId === r.id && (
                                               <tr className="kv-detail-row">
                                                 <td colSpan={9}>
                                                   <ProductDetail
@@ -126,19 +115,15 @@ useEffect(() => {
                                                 </td>
                                               </tr>
                                             )} */}
-                                          </React.Fragment>
-                                        ))}
-
-                    
+                      </React.Fragment>
+                    ))}
                   </tbody>
                 </table>
               </div>
               <div className="pagination-bar">
                 <div className="left">
                   <span>Hiển thị</span>
-                  <select
-                    
-                  >
+                  <select>
                     <option value={5}>5</option>
                     <option value={10}>10</option>
                     <option value={15}>15</option>
@@ -148,34 +133,14 @@ useEffect(() => {
                 </div>
 
                 <div className="center">
-                  <button
-                    
-                  >
-                    ⏮
-                  </button>
-                  <button
-                    
-                  >
-                    ◀
-                  </button>
+                  <button>⏮</button>
+                  <button>◀</button>
 
-                  
-
-                  <button
-                    
-                  >
-                    ▶
-                  </button>
-                  <button
-                    
-                  >
-                    ⏭
-                  </button>
+                  <button>▶</button>
+                  <button>⏭</button>
                 </div>
 
-                <div className="right">
-                  
-                </div>
+                <div className="right"></div>
               </div>
             </div>
           </div>

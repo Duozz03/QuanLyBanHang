@@ -108,6 +108,7 @@ export default function ShopDashboard() {
     setModalOpen(true);
   };
 
+  
   const handleSave = (product, isEdit) => {
     if (!product) return;
 
@@ -122,7 +123,7 @@ export default function ShopDashboard() {
       price: Number(product.price) || 0,
       quantity: Number(product.quantity) || 0,
       status: product.status || "ACTIVE",
-      category: product.category || "",
+      categoryId: product.categoryId || "",
       // FIX: Date object không slice được
       createdAt: product.createdAt || new Date().toISOString().slice(0, 10), // YYYY-MM-DD
       // ảnh: nếu backend chưa trả urlImage thì dùng placeholder
