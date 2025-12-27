@@ -4,6 +4,7 @@ import "./Header.css";
 
 export default function Header() {
   const [showMenuProduct, setShowMenuProduct] = useState(false);
+  const [showMenuUser, setshowMenuUser] = useState(false);
 
 
   return (
@@ -34,8 +35,8 @@ export default function Header() {
                 onMouseLeave={() => setShowMenuProduct(false)}
               >
                 <div className={`kv-link ${showMenuProduct ? "active" : ""}`}>Hàng Hóa</div>
-                <NavLink
-                  to="/products"
+                <div
+                  
                   className={`mega-menu ${showMenuProduct ? "show" : ""}`}
                 >
                 <p className="small-title">Hàng hóa</p>
@@ -46,12 +47,12 @@ export default function Header() {
                     </a>
                   </li>
                   <li>
-                    <a href="/categories">
+                    <a href="/category">
                       Danh Sách Loại hàng
                     </a>
                   </li>
                 </ul>
-                </NavLink>
+                </div>
               </div>
 
             <NavLink to="/orders" className="kv-link">
@@ -60,9 +61,27 @@ export default function Header() {
             <NavLink to="/customers" className="kv-link">
               Khách hàng
             </NavLink>
-            <NavLink to="/staff" className="kv-link">
-              Nhân viên
-            </NavLink>
+            <div
+                className="product-menu-wrapper"
+                onMouseEnter={() =>
+                  setshowMenuUser(true)
+                }
+                onMouseLeave={() => setshowMenuUser(false)}
+              >
+                <div className={`kv-link ${showMenuUser ? "active" : ""}`}>Nhân Viên</div>
+                <div
+                  
+                  className={`mega-menu ${showMenuUser ? "show" : ""}`}
+                >
+                <ul className="menu-options">
+                  <li>
+                    <a href="/user">
+                      Danh Sách Nhân viên
+                    </a>
+                  </li>
+                </ul>
+                </div>
+              </div>
           </nav>
 
           <button className="kv-pill">Bán hàng</button>

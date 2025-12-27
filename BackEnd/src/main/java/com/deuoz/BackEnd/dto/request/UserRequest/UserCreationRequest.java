@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -19,7 +18,6 @@ public class UserCreationRequest {
     String fullName;
     String address;
     String email;
-    Date create_at;
     Status status;
-    Role roles;
+    Role role;
 }

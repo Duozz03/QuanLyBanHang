@@ -2,9 +2,10 @@
    BACKDROP
 ========================= */
 .custom-backdrop {
-  background-color: rgba(0, 0, 0, 0.35);
-  z-index: 1050;
+   /* 🌫️ trong suốt */
+  backdrop-filter: blur(2px);                /* ✨ mờ nền (optional) */
 }
+
 
 /* =========================
    MODAL CONTAINER

@@ -4,8 +4,6 @@ import com.deuoz.BackEnd.Enum.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,5 +17,5 @@ public class ProductUpdateRequest {
     double importPrice;
     int quantity;
     Status status;
-    String category;
+    Long categoryId;
 }

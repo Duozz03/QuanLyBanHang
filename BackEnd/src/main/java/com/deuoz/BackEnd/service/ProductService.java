@@ -3,11 +3,14 @@ package com.deuoz.BackEnd.service;
 import com.deuoz.BackEnd.dto.request.ProductRequest.ProductCreationRequest;
 import com.deuoz.BackEnd.dto.request.ProductRequest.ProductUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
+import com.deuoz.BackEnd.entity.Category;
 import com.deuoz.BackEnd.entity.Product;
 import com.deuoz.BackEnd.exception.AppException;
 import com.deuoz.BackEnd.exception.ErrorCode;
 import com.deuoz.BackEnd.mapper.ProductMapper;
+import com.deuoz.BackEnd.repository.CategoryRepository;
 import com.deuoz.BackEnd.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,22 +29,34 @@ import java.util.List;
 public class ProductService {
     ProductRepository productRepository;
     ProductMapper productMapper;
+    CategoryRepository categoryRepository;
+    @Transactional
     public ProductResponse createProduct(ProductCreationRequest productRequest, MultipartFile productImage)
             throws IOException {
+        Category category = categoryRepository.findById(productRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + productRequest.getCategoryId()));
         var product = productMapper.toProduct(productRequest);
+        product.setCategory(category);
         try {
             product.setUrlImage(productImage.getBytes());
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload product image", e);
         }
-        return  productMapper.toProductResponse(productRepository.save(product))
+        Product save = productRepository.save(product);
+        categoryRepository.updateQuantity(category.getId(), +1);
+        return  productMapper.toProductResponse(save)
                              .withImageUrl("/products/" + product.getId() + "/image");
     }
-
+    @Transactional
     public ProductResponse updateProduct(Long id, ProductUpdateRequest productRequest,MultipartFile productImage)
             throws IOException {
+        Category category = categoryRepository.findById(productRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + productRequest.getCategoryId()));
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+        Long categoryOldId = product.getCategory().getId();
+        product.setCategory(category);
+        Long categoryNewId = product.getCategory().getId();
         productMapper.updateProduct(product, productRequest);
         try {
             if(productImage!=null && !productImage.isEmpty()){
@@ -50,11 +65,20 @@ public class ProductService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload product image", e);
         }
-        return productMapper.toProductResponse(productRepository.save(product))
+        Product savedProduct = productRepository.save(product);
+        categoryRepository.updateQuantity(categoryOldId, -1);
+        categoryRepository.updateQuantity(categoryNewId, +1);
+
+        return productMapper.toProductResponse(savedProduct)
                             .withImageUrl("/products/" + product.getId() + "/image");
     }
+    @Transactional
     public void deleteProduct(Long id) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+        Long categoryId = p.getCategory().getId();
         productRepository.deleteById(id);
+        categoryRepository.updateQuantity(categoryId, -1);
     }
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll().stream()

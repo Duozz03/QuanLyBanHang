@@ -5,9 +5,6 @@ import com.deuoz.BackEnd.Enum.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
-
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,5 +16,5 @@ public class UserResponse {
     String address;
     String email;
     Status status;
-    Role roles;
+    Role role;
 }

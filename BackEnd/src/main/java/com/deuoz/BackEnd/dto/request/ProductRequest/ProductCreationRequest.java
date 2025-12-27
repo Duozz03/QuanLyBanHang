@@ -1,11 +1,7 @@
 package com.deuoz.BackEnd.dto.request.ProductRequest;
-
 import com.deuoz.BackEnd.Enum.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @Builder
@@ -20,5 +16,5 @@ public class ProductCreationRequest {
     double importPrice;
     int quantity;
     Status status;
-    String category;
+    Long categoryId;
 }

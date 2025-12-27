@@ -10,7 +10,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -31,5 +30,5 @@ public class User {
     String email;
     Date create_at;
     Status status;
-    Role roles;
+    Role role;
 }

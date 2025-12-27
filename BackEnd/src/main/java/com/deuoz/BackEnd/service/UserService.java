@@ -1,6 +1,5 @@
 package com.deuoz.BackEnd.service;
 
-import com.deuoz.BackEnd.Enum.Role;
 import com.deuoz.BackEnd.dto.request.UserRequest.UserCreationRequest;
 import com.deuoz.BackEnd.dto.request.UserRequest.UserUpdateRequest;
 import com.deuoz.BackEnd.dto.response.UserResponse;
@@ -15,13 +14,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal=true)
 @Slf4j
+
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
@@ -60,5 +59,13 @@ public class UserService {
                 () -> new RuntimeException("User not found")
         );
         return userMapper.toUserResponse(user);
+    }
+    public List<UserResponse> getAllUser(){
+        return userRepository.findAll().stream()
+                .map(userMapper::toUserResponse)
+                .toList();
+    }
+    public void delete(Long id){
+        userRepository.deleteById(id);
     }
 }

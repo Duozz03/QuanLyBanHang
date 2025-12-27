@@ -29,7 +29,10 @@ public class Product {
     int quantity;
     Status status;
     LocalDate createdAt;
-    String category;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id",nullable = false)
+    Category category;
 
     @PrePersist
     protected void onCreate() {

@@ -109,37 +109,59 @@ export default function ShopDashboard() {
   };
 
   const handleSave = (product, isEdit) => {
+    if (!product) return;
+
+    // Chuẩn hoá dữ liệu đầu vào từ backend
+    const normalized = {
+      ...product,
+      id: String(product.id),
+      barcode: product.barcode ?? "",
+      name: product.name ?? "",
+      description: product.description ?? "",
+      importPrice: Number(product.importPrice) || 0,
+      price: Number(product.price) || 0,
+      quantity: Number(product.quantity) || 0,
+      status: product.status || "ACTIVE",
+      category: product.category || "",
+      // FIX: Date object không slice được
+      createdAt: product.createdAt || new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+      // ảnh: nếu backend chưa trả urlImage thì dùng placeholder
+      urlImage: product.urlImage || "/images/product-placeholder.png",
+    };
+
     if (isEdit) {
       setProducts((prev) =>
-        prev.map((p) => (p.id === product.id ? { ...p, ...product } : p))
+        prev.map((p) =>
+          String(p.id) === String(normalized.id)
+            ? {
+                ...p,
+                ...normalized,
+                // nếu backend không trả urlImage, giữ urlImage cũ
+                urlImage: normalized.urlImage || p.urlImage,
+              }
+            : p
+        )
       );
+
       setModalOpen(false);
-      setExpandedId(product.id);
+      setExpandedId(normalized.id);
       setEditProduct(null);
-    } else {
-      let pid = product.id;
-      if (products.find((p) => p.id === pid)) {
-        pid = pid + "-" + Date.now().toString().slice(-4);
-        product.id = pid;
-      }
-      const toAdd = {
-        id: String(product.id),
-        barcode: product.barcode || "",
-        name: product.name || "",
-        urlImage: product.urlImage,
-        description: product.description || "",
-        importPrice: Number(product.importPrice) || 0,
-        price: Number(product.price) || 0,
-        quantity: Number(product.quantity) || 0,
-        status: product.status || "ACTIVE",
-        createdAt: product.createdAt || new Date().slice(0, 10),
-        category: product.category || "",
-        img: product.img || "",
-      };
-      setProducts((prev) => [...prev, toAdd]);
-      setModalOpen(false);
-      setExpandedId(toAdd.id);
+      return;
     }
+
+    // CREATE
+    setProducts((prev) => {
+      // tránh trùng id (hiếm khi xảy ra nếu backend sinh id chuẩn)
+      const exists = prev.some((p) => String(p.id) === String(normalized.id));
+      const finalProduct = exists
+        ? { ...normalized, id: `${normalized.id}-${Date.now()}` }
+        : normalized;
+
+      return [...prev, finalProduct];
+    });
+
+    setModalOpen(false);
+    setExpandedId(normalized.id);
   };
 
   const handleDelete = async (product) => {
