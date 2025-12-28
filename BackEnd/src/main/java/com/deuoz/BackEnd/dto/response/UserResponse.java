@@ -5,6 +5,9 @@ import com.deuoz.BackEnd.Enum.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +18,8 @@ public class UserResponse {
     String fullName;
     String address;
     String email;
+    String sdt;
+    LocalDateTime create_at;
     Status status;
     Role role;
 }
