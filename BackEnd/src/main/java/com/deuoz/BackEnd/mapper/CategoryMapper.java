@@ -19,7 +19,6 @@ public interface CategoryMapper {
     Category toCategory(CategoryCreationRequest request);
     @Mapping(target = "parentId", expression = "java(category.getParent() != null ? category.getParent().getId() : null)")
     @Mapping(target = "children", source = "children")
-    @Mapping(target = "products", source = "products")
     CategoryResponse toCategoryResponse(Category category);
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "parent", ignore = true)

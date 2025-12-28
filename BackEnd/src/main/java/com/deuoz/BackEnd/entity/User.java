@@ -2,10 +2,7 @@ package com.deuoz.BackEnd.entity;
 
 import com.deuoz.BackEnd.Enum.Role;
 import com.deuoz.BackEnd.Enum.Status;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -29,6 +26,10 @@ public class User {
     String address;
     String email;
     Date create_at;
-    Status status;
-    Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
+    Status status = Status.ACTIVE;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
+    Role role = Role.STAFF;
 }

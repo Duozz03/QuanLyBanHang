@@ -14,7 +14,7 @@ export default function ListUser() {
           sessionStorage.getItem("accessToken");
 
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/users`,
+          `${import.meta.env.VITE_API_BASE_URL}/user`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = res.data.result || [];
@@ -29,6 +29,10 @@ export default function ListUser() {
 
     loadUser();
   }, []);
+
+
+  
+
 
   return (
     <div className="kv-app">
@@ -101,7 +105,6 @@ export default function ListUser() {
                           <td>{r.email}</td>
                           <td>{r.status}</td>
                           <td>{r.role}</td>
-                          <td>{r.createdAt}</td>
                         </tr>
 
                         {/* {expandedId === r.id && (

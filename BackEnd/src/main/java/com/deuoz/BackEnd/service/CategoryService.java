@@ -80,25 +80,6 @@ public class CategoryService {
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
 
         CategoryResponse resp = categoryMapper.toCategoryResponse(category);
-
-        fillProductImageUrlRecursive(resp);
-
         return resp;
-    }
-
-    private void fillProductImageUrlRecursive(CategoryResponse node) {
-        if (node == null) return;
-
-        if (node.getProducts() != null) {
-            node.getProducts().forEach(p -> {
-                if (p.getId() != null) {
-                    p.setUrlImage("/products/" + p.getId() + "/image");
-                }
-            });
-        }
-
-        if (node.getChildren() != null) {
-            node.getChildren().forEach(this::fillProductImageUrlRecursive);
-        }
     }
 }

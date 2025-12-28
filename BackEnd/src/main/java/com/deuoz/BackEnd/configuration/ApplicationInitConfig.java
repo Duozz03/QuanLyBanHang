@@ -1,6 +1,7 @@
 package com.deuoz.BackEnd.configuration;
 
 import com.deuoz.BackEnd.Enum.Role;
+import com.deuoz.BackEnd.Enum.Status;
 import com.deuoz.BackEnd.entity.User;
 import com.deuoz.BackEnd.repository.UserRepository;
 import lombok.AccessLevel;
@@ -23,10 +24,11 @@ public class ApplicationInitConfig {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()){
                 Role roles = Role.ADMIN;
-
+                Status status = Status.ACTIVE;
                 User user = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
+                        .status(status)
                         .role(roles)
                         .build();
 
