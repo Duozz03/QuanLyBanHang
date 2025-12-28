@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -25,11 +26,17 @@ public class User {
     String fullName;
     String address;
     String email;
-    Date create_at;
+    String sdt;
+    LocalDateTime create_at;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
     Status status = Status.ACTIVE;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
     Role role = Role.STAFF;
+
+    @PrePersist
+    protected void onCreate() {
+        this.create_at = LocalDateTime.now();
+    }
 }

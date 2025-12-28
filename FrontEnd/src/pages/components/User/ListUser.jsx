@@ -76,6 +76,7 @@ export default function ListUser() {
                       <th>Số điện thoại</th>
                       <th>Trạng thái</th>
                       <th>Chức vụ</th>
+                      <th>Ngày tạo</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -99,6 +100,7 @@ export default function ListUser() {
                           <td>{r.fullName}</td>
                           <td>{r.address}</td>
                           <td>{r.email}</td>
+                          <td>{r.sdt}</td>
                           <td>{r.status}</td>
                           <td>{r.role}</td>
                           <td>{r.createdAt}</td>
