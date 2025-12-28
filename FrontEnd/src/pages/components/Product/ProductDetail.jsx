@@ -1,13 +1,34 @@
 // ProductDetail.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./ShopDashboard.css"; // dùng chung CSS (hoặc tạo file CSS riêng nếu muốn)
-
+import axios from "axios";
 
 
 
 export default function ProductDetail({ product, onEdit, onDelete }) {
 
+  const [idcategory, setIdcategory] = useState("");
+ const loadidCategory = async () => {
+    try{
+      const token = 
+      localStorage.getItem("accessToken") ||
+       sessionStorage.getItem("accessToken");
 
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/categories/${product.categoryId}`,
+         { headers:{ Authorization: `Bearer ${token}` }  } 
+      );
+        const data = res.data.result || [];
+        
+      setIdcategory(data);  
+    } catch (err){
+      console.error(err);
+      alert("Lỗi khi tải loại");
+    }
+  };
+useEffect(() => {
+  loadidCategory();
+}, []);
 
 
 
@@ -17,8 +38,8 @@ export default function ProductDetail({ product, onEdit, onDelete }) {
     if (v == null || isNaN(Number(v))) return "0";
     return Number(v).toLocaleString();
   };
-console.log(product);
-console.log(product.createdAt);
+console.log(product.categoryId);
+
 
 
   return (
@@ -40,12 +61,12 @@ console.log(product.createdAt);
 
         <div className="kv-detail-grid" style={{ marginTop: 12 }}>
           <div>
-            <div className="label">Product ID</div>
+            <div className="label">Mã hàng hóa</div>
             <div className="value">{product.id || "—"}</div>
           </div>
 
           <div>
-            <div className="label">Barcode</div>
+            <div className="label">Mã vạch</div>
             <div className="value">{product.barcode || "—"}</div>
             <></>
           </div>
@@ -56,12 +77,12 @@ console.log(product.createdAt);
           </div>
 
           <div>
-            <div className="label">Sale price</div>
+            <div className="label">Giá bán</div>
             <div className="value">{formatCurrency(product.price)}</div>
           </div>
 
           <div>
-            <div className="label">Import price</div>
+            <div className="label">Giá nhập</div>
             <div className="value">{formatCurrency(product.importPrice)}</div>
           </div>
 
@@ -77,7 +98,7 @@ console.log(product.createdAt);
 
           <div>
             <div className="label">Danh mục</div>
-            <div className="value">{product.category || "Chưa phân loại"}</div>
+            <div className="value">{idcategory.name || "Chưa phân loại" }</div>
           </div>
         </div>
 

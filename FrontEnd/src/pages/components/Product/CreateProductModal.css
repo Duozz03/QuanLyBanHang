@@ -2,9 +2,10 @@
    BACKDROP
 ========================= */
 .custom-backdrop {
-  background-color: rgba(0, 0, 0, 0.35);
-  z-index: 1050;
+   /* 🌫️ trong suốt */
+  backdrop-filter: blur(2px);                /* ✨ mờ nền (optional) */
 }
+
 
 /* =========================
    MODAL CONTAINER
@@ -12,17 +13,14 @@
 .modal.d-block {
   position: fixed;
   inset: 0;
-
   display: flex;
   align-items: flex-start;     /* 👈 QUAN TRỌNG */
   justify-content: center;
-
-  padding-top: 100px;          /* 👈 ĐẨY DƯỚI HEADER */
+  background: rgba(0,0,0,0.15);
+  padding-top: 80px;          /* 👈 ĐẨY DƯỚI HEADER */
   padding-left: 24px;
   padding-right: 24px;
   padding-bottom: 24px;
-
-  overflow-y: auto;            /* 👈 SCROLL CHUẨN */
   z-index: 1060;
 }
 

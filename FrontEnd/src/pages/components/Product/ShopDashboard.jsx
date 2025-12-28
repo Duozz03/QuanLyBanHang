@@ -108,6 +108,7 @@ export default function ShopDashboard() {
     setModalOpen(true);
   };
 
+  
   const handleSave = (product, isEdit) => {
     if (!product) return;
 
@@ -122,7 +123,7 @@ export default function ShopDashboard() {
       price: Number(product.price) || 0,
       quantity: Number(product.quantity) || 0,
       status: product.status || "ACTIVE",
-      category: product.category || "",
+      categoryId: product.categoryId || "",
       // FIX: Date object không slice được
       createdAt: product.createdAt || new Date().toISOString().slice(0, 10), // YYYY-MM-DD
       // ảnh: nếu backend chưa trả urlImage thì dùng placeholder
@@ -342,37 +343,59 @@ export default function ShopDashboard() {
                   </tbody>
                 </table>
               </div>
-              <div className="phantran mt-2 d-flex gap-3">
-                <select
-                  className="option"
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setCurrentPage(1); // reset về trang đầu
-                  }}
-                >
-                  <option value={5}>5 / trang</option>
-                  <option value={10}>10 / trang</option>
-                  <option value={20}>20 / trang</option>
-                  <option value={50}>50 / trang</option>
-                </select>
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                >
-                  ◀ Trước
-                </button>
+              <div className="pagination-bar">
+                <div className="left">
+                  <span>Hiển thị</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={20}>20</option>
+                  </select>
+                  <span>dòng</span>
+                </div>
 
-                <span>
-                  Trang {currentPage} / {totalPages}
-                </span>
+                <div className="center">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(1)}
+                  >
+                    ⏮
+                  </button>
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    ◀
+                  </button>
 
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                >
-                  Sau ▶
-                </button>
+                  <span className="page-number">{currentPage}</span>
+
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    ▶
+                  </button>
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(totalPages)}
+                  >
+                    ⏭
+                  </button>
+                </div>
+
+                <div className="right">
+                  {`${(currentPage - 1) * pageSize + 1}
+      - ${Math.min(currentPage * pageSize, 10)}
+      trong ${10} hàng hóa`}
+                </div>
               </div>
             </div>
           </div>

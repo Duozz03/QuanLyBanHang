@@ -1,0 +1,169 @@
+.kv-wrapper {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  font-family: system-ui;
+  margin: 0px 100px ;
+}
+
+/* HEADER */
+.kv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.kv-header h3 {
+  margin: 0;
+}
+
+.kv-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* BUTTONS */
+.kv-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-outline {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* TABLE */
+.kv-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kv-table th {
+  background: #f9fafb;
+  text-align: left;
+  padding: 10px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.kv-table td {
+  border-top: 1px solid #e5e7eb;
+  padding: 10px;
+}
+
+.center {
+  text-align: center;
+}
+
+/* TREE */
+.tree-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.caret {
+  cursor: pointer;
+  font-size: 14px;
+  width: 14px;
+}
+
+.node-name {
+  font-weight: 500;
+}
+
+/* ICON */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  margin: 0 4px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  width: 520px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.2);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body label {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.modal-body input,
+.modal-body select {
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  outline: none;
+}
+
+.modal-body input::placeholder {
+  color: #9ca3af;
+}
+
+.modal-footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+tr:hover{
+  background-color: #d5d7de;
+}
+
+input{
+  border-radius: 8px ;
+}
+select{
+  border-radius: 8px ;
+}
+option{
+  border-radius: 8px ;
+}
