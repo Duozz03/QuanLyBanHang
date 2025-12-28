@@ -14,7 +14,7 @@ export default function ListUser() {
           sessionStorage.getItem("accessToken");
 
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/user`,
+          `${import.meta.env.VITE_API_BASE_URL}/users`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = res.data.result || [];
@@ -107,6 +107,7 @@ export default function ListUser() {
                           <td>{r.sdt}</td>
                           <td>{r.status}</td>
                           <td>{r.role}</td>
+                          <td>{r.create_at}</td>
                         </tr>
 
                         {/* {expandedId === r.id && (
