@@ -30,10 +30,6 @@ export default function ListUser() {
     loadUser();
   }, []);
 
-
-  
-
-
   return (
     <div className="kv-app">
       {/* main: use bootstrap container + kv-main grid fallback */}
@@ -107,7 +103,7 @@ export default function ListUser() {
                           <td>{r.sdt}</td>
                           <td>{r.status}</td>
                           <td>{r.role}</td>
-                          <td>{r.create_at}</td>
+                          <td>{r.created_at}</td>
                         </tr>
 
                         {/* {expandedId === r.id && (
