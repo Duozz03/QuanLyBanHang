@@ -256,7 +256,7 @@ export default function CreateProductModal({
                           <div className="d-flex gap-2">
                             <select
                               className="form-select flex-grow-1"
-                              name="category"
+                              name="categoryId"
                               value={form.categoryId}
                               onChange={handleChange}
                             >

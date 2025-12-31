@@ -5,6 +5,7 @@ import axios from "axios";
 import "./ListUser.css"; // giữ file CSS tuỳ chỉnh
 export default function ListUser() {
   const [user, setUser] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const loadUser = async () => {
@@ -42,7 +43,12 @@ export default function ListUser() {
           {/* main table */}
           <div className="col-9 d-flex align-items-center justify-content-between kv-content-head">
             <div className="chip-search-wrapper">
-              <input />
+              <input
+                className="chip-input"
+                placeholder="Tìm nhân viên"
+                
+                
+              />
             </div>
 
             <div className="d-flex gap-2">
@@ -101,9 +107,9 @@ export default function ListUser() {
                           <td>{r.address}</td>
                           <td>{r.email}</td>
                           <td>{r.sdt}</td>
-                          <td>{r.status}</td>
+                          <td>{r.status === "ACTIVE" ? "Đang Hoạt Động" : "Ngừng Hoạt Động" }</td>
                           <td>{r.role}</td>
-                          <td>{r.created_at}</td>
+                          <td>{r.create_at}</td>
                         </tr>
 
                         {/* {expandedId === r.id && (

@@ -5,6 +5,7 @@ import HomePage from "./pages/components/Login/HomePage";
 import MainLayout from "./layout/MainLayout";
 import ListCategory from "./pages/components/Category/ListCategory";
 import ListUser from "./pages/components/User/ListUser";
+import CreateUser from "./pages/components/User/CreateUser";
 
 
 
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/products" element={<ShopDashboard />} />
         <Route path="*" element={<Navigate to="/login" />} />
         
+        <Route path="/orders" element={<CreateUser />} />
         <Route path="/category" element={<ListCategory />} />
         <Route path="/customers" element={<div>Khách hàng</div>} />
         <Route path="/user" element={<ListUser/>} />
