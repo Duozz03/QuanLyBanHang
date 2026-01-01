@@ -8,7 +8,7 @@ import com.deuoz.BackEnd.exception.AppException;
 import com.deuoz.BackEnd.exception.ErrorCode;
 import com.deuoz.BackEnd.mapper.CategoryMapper;
 import com.deuoz.BackEnd.repository.CategoryRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

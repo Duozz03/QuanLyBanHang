@@ -22,6 +22,8 @@ public enum ErrorCode {
     NAME_CATEGORY_ALREADY_EXISTS(3004, "Category name already exists", HttpStatus.BAD_REQUEST),
     INVALID_CREDENTIALS(1008, "Invalid credentials", HttpStatus.UNAUTHORIZED),
     TOKEN_CREATION_FAILED(1010, "Cannot create token", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVOICE_NOT_FOUND(1011, "Invoice not found",HttpStatus.NOT_FOUND ),
+    PRODUCT_OUT_OF_STOCK(1012, "product out of stock",HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatus statusCode) {

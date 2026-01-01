@@ -6,13 +6,14 @@ import com.deuoz.BackEnd.dto.response.InvoiceResponse;
 import com.deuoz.BackEnd.entity.Invoice;
 import com.deuoz.BackEnd.mapper.InvoiceMapper;
 import com.deuoz.BackEnd.service.InvoiceService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/invoices")
@@ -23,8 +24,21 @@ public class InvoiceController {
     InvoiceService invoiceService;
     InvoiceMapper invoiceMapper;
     @PostMapping
-    public InvoiceResponse createInvoice(InvoiceCreateRequest req) {
-        Invoice invoice = invoiceService.createInvoice(req);
-        return invoiceMapper.toResponse(invoice);
+    public ApiResponse<InvoiceResponse> createInvoice(@Valid @RequestBody InvoiceCreateRequest req) {
+        return ApiResponse.<InvoiceResponse>builder()
+                .result(invoiceService.createInvoice(req))
+                .build();
+    }
+    @GetMapping
+    public ApiResponse<List<InvoiceResponse>> getInvoices() {
+        return ApiResponse.<List<InvoiceResponse>>builder()
+                .result(invoiceService.getInvoices())
+                .build();
+    }
+    @GetMapping("/{invoiceId}")
+    public ApiResponse<InvoiceResponse> getInvoice(@PathVariable("invoiceId") Long invoiceId) {
+        return ApiResponse.<InvoiceResponse>builder()
+                .result(invoiceService.getInvoice(invoiceId))
+                .build();
     }
 }

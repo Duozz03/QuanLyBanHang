@@ -3,12 +3,16 @@ package com.deuoz.BackEnd.service;
 import com.deuoz.BackEnd.Enum.InvoiceStatus;
 import com.deuoz.BackEnd.dto.request.InvoiceRequest.InvoiceCreateRequest;
 import com.deuoz.BackEnd.dto.request.InvoiceRequest.InvoiceDetailCreateRequest;
+import com.deuoz.BackEnd.dto.response.InvoiceResponse;
 import com.deuoz.BackEnd.entity.Invoice;
 import com.deuoz.BackEnd.entity.InvoiceDetail;
 import com.deuoz.BackEnd.entity.Product;
+import com.deuoz.BackEnd.exception.AppException;
+import com.deuoz.BackEnd.exception.ErrorCode;
+import com.deuoz.BackEnd.mapper.InvoiceMapper;
 import com.deuoz.BackEnd.repository.InvoiceRepository;
 import com.deuoz.BackEnd.repository.ProductRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal=true)
@@ -27,11 +32,13 @@ public class InvoiceService {
 
     InvoiceRepository invoiceRepository;
     ProductRepository productRepository;
+    InvoiceMapper invoiceMapper;
     @Transactional
-    public Invoice createInvoice(InvoiceCreateRequest req) {
+    public InvoiceResponse createInvoice(InvoiceCreateRequest req) {
 
         Invoice invoice = new Invoice();
-        invoice.setStatus(InvoiceStatus.PAID);
+        invoice.setStatus(InvoiceStatus.UNPAID);
+        invoice.setPaidAt(null);
         invoice.setCreatedAt(LocalDateTime.now());
         invoice.setCode(generateCode());
 
@@ -40,13 +47,13 @@ public class InvoiceService {
 
         for (InvoiceDetailCreateRequest itemReq : req.getDetails()) {
             Product product = productRepository.findById(itemReq.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found: " + itemReq.getProductId()));
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
             int qty = itemReq.getQuantity();
 
             // 1) Check tồn kho
             if (product.getQuantity() == 0 || product.getQuantity() < qty) {
-                throw new RuntimeException("Not enough stock for product: " + product.getName());
+                throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
             }
 
             // 2) Xác định giá bán (sale nếu hợp lệ)
@@ -94,7 +101,7 @@ public class InvoiceService {
         invoice.setDiscount(billDiscount);
         invoice.setFinalAmount(finalAmount);
 
-        return invoiceRepository.save(invoice);
+        return invoiceMapper.toResponse(invoiceRepository.save(invoice));
     }
 
     private boolean isOnSale(Product p, LocalDate today) {
@@ -113,5 +120,15 @@ public class InvoiceService {
         // đơn giản: HDyyyyMMdd-HHmmss
         String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         return "HD" + date;
+    }
+    public List<InvoiceResponse> getInvoices() {
+        return invoiceRepository.findAll().stream()
+                .map(invoiceMapper::toResponse)
+                .toList();
+    }
+    public InvoiceResponse getInvoice(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.INVOICE_NOT_FOUND));
+        return invoiceMapper.toResponse(invoice);
     }
 }
