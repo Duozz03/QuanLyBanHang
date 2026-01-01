@@ -4,9 +4,11 @@ import com.deuoz.BackEnd.dto.request.CategoryRequest.CategoryCreationRequest;
 import com.deuoz.BackEnd.dto.request.CategoryRequest.CategoryUpdateRequest;
 import com.deuoz.BackEnd.dto.response.CategoryResponse;
 import com.deuoz.BackEnd.entity.Category;
+import com.deuoz.BackEnd.exception.AppException;
+import com.deuoz.BackEnd.exception.ErrorCode;
 import com.deuoz.BackEnd.mapper.CategoryMapper;
 import com.deuoz.BackEnd.repository.CategoryRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,12 +28,13 @@ public class CategoryService {
     public CategoryResponse createCategory(CategoryCreationRequest category_cre) {
         Category category = categoryMapper.toCategory(category_cre);
         if(categoryRepository.existsByName(category_cre.getName())){
-            throw new RuntimeException("Name category already exists");
+            throw new AppException(ErrorCode.NAME_CATEGORY_ALREADY_EXISTS);
         }
         if(category_cre.getParentId() != null){
-            Category parent = categoryRepository.findById(category_cre.getParentId()).orElseThrow(() -> new RuntimeException("Parent category not found with id: " + category_cre.getParentId()));
+            Category parent = categoryRepository.findById(category_cre.getParentId()).orElseThrow(() -> new AppException(ErrorCode.PARENT_CATEGORY_NOT_FOUND));
+
             if(depth(parent) >= 3){
-                throw new RuntimeException("Category depth cannot exceed 3 levels");
+                throw new AppException(ErrorCode.CATEGORY_DEPTH_EXCEEDED);
             }
             category.setParent(parent);
         }
@@ -48,11 +51,11 @@ public class CategoryService {
     }
     @Transactional
     public CategoryResponse updateCategory(Long id, CategoryUpdateRequest categoryRequest){
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
         if(categoryRequest.getParentId() != null){
-            Category parent = categoryRepository.findById(categoryRequest.getParentId()).orElseThrow(() -> new RuntimeException("Parent category not found with id: " + categoryRequest.getParentId()));
+            Category parent = categoryRepository.findById(categoryRequest.getParentId()).orElseThrow(() -> new AppException(ErrorCode.PARENT_CATEGORY_NOT_FOUND));
             if(depth(parent) >= 3){
-                throw new RuntimeException("Category depth cannot exceed 3 levels");
+                throw new AppException(ErrorCode.CATEGORY_DEPTH_EXCEEDED);
             }
             category.setParent(parent);
         }
@@ -61,11 +64,11 @@ public class CategoryService {
     }
     @Transactional
     public void deleteCategory(Long id) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
         if(category.getChildren().isEmpty()){
             categoryRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Cannot delete category with subcategories");
+            throw new AppException(ErrorCode.CATEGORY_HAS_CHILDREN);
         }
     }
 
@@ -77,7 +80,7 @@ public class CategoryService {
 
     public CategoryResponse getCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
 
         CategoryResponse resp = categoryMapper.toCategoryResponse(category);
         return resp;

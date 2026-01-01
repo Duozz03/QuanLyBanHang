@@ -3,6 +3,8 @@ package com.deuoz.BackEnd.service;
 import com.deuoz.BackEnd.dto.request.AuthenticationRequest;
 import com.deuoz.BackEnd.dto.response.AuthenticationResponse;
 import com.deuoz.BackEnd.entity.User;
+import com.deuoz.BackEnd.exception.AppException;
+import com.deuoz.BackEnd.exception.ErrorCode;
 import com.deuoz.BackEnd.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -37,13 +39,13 @@ public class AuthenticationService {
     public AuthenticationResponse  authenticate(AuthenticationRequest request){
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(),
                 user.getPassword());
 
         if (!authenticated)
-            throw new RuntimeException("Invalid credentials");
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
 
         var token = generateToken(user);
 
@@ -74,9 +76,8 @@ public class AuthenticationService {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            log.error("Cannot create token", e);
-            throw new RuntimeException(e);
-        }
+            //log.error("Cannot create token", e);
+            throw new AppException(ErrorCode.TOKEN_CREATION_FAILED);        }
     }
 
     private String buildScope(User user) {

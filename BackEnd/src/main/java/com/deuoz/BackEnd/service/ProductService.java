@@ -10,7 +10,7 @@ import com.deuoz.BackEnd.exception.ErrorCode;
 import com.deuoz.BackEnd.mapper.ProductMapper;
 import com.deuoz.BackEnd.repository.CategoryRepository;
 import com.deuoz.BackEnd.repository.ProductRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -51,7 +51,7 @@ public class ProductService {
     public ProductResponse updateProduct(Long id, ProductUpdateRequest productRequest,MultipartFile productImage)
             throws IOException {
         Category category = categoryRepository.findById(productRequest.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + productRequest.getCategoryId()));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
         Long categoryOldId = product.getCategory().getId();
@@ -63,7 +63,7 @@ public class ProductService {
                 product.setUrlImage(productImage.getBytes());
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to upload product image", e);
+            throw new AppException(ErrorCode.IMAGE_UPLOAD_FAILED);
         }
         Product savedProduct = productRepository.save(product);
         categoryRepository.updateQuantity(categoryOldId, -1);

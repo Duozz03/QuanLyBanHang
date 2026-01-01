@@ -27,7 +27,7 @@ public class Invoice {
     LocalDateTime createdAt;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
-    InvoiceStatus status = InvoiceStatus.PAID;
+    InvoiceStatus status = InvoiceStatus.UNPAID;
 
     double totalAmount = 0;
     double discount = 0;
@@ -37,9 +37,16 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     List<InvoiceDetail> details = new ArrayList<>();
 
+    @OneToOne(mappedBy = "invoice", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Payment payment;
+
+    LocalDateTime paidAt;
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
+        if(status == null) {
+            status = InvoiceStatus.UNPAID;
+        }
     }
 
 }

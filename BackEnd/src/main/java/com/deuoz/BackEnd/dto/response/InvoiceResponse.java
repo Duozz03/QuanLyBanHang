@@ -19,7 +19,7 @@ public class InvoiceResponse {
     LocalDateTime createdAt;
     InvoiceStatus status;
     double totalAmount;
-    double discountAmount;
+    double discount;
     double finalAmount;
     private List<InvoiceDetailResponse> details;
 }
