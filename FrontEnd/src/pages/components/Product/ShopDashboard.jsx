@@ -108,7 +108,6 @@ export default function ShopDashboard() {
     setModalOpen(true);
   };
 
-  
   const handleSave = (product, isEdit) => {
     if (!product) return;
 

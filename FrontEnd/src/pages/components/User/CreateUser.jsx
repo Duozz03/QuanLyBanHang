@@ -1,8 +1,8 @@
-import {  useReducer , useState } from "react";
+import { useReducer, useEffect } from "react";
 import axios from "axios";
 
 ///// Sử dụng useReducer
-  const initialState = {
+const initialState = {
   values: {
     username: "",
     fullName: "",
@@ -18,14 +18,11 @@ import axios from "axios";
 
 //////// Rule validate
 const validators = {
-  username: (v) =>
-    !v ? "Tên tài khoản không được để trống" : "",
+  username: (v) => (!v ? "Tên tài khoản không được để trống" : ""),
 
-  fullName: (v) =>
-    !v ? "Tên người dùng không được để trống" : "",
+  fullName: (v) => (!v ? "Tên người dùng không được để trống" : ""),
 
-  address: (v) =>
-    !v ? "Địa chỉ không được để trống" : "",
+  address: (v) => (!v ? "Địa chỉ không được để trống" : ""),
 
   sdt: (v) =>
     !/^\d{10}$/.test(v)
@@ -33,25 +30,21 @@ const validators = {
       : "",
 
   email: (v) =>
-    v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-      ? "Email không hợp lệ"
-      : "Vui lòng nhập gmail",
-
-  password: (v) =>
-    v.length < 6
-      ? "Mật khẩu tối thiểu 6 ký tự"
+    !v
+      ? "Email không được để trống"
+      : !/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(v)
+      ? "Email phải là Gmail (vd: example@gmail.com)"
       : "",
-};
 
+  password: (v) => (v.length < 6 ? "Mật khẩu tối thiểu 6 ký tự" : ""),
+};
 
 //////// useReducer
 function formReducer(state, action) {
   switch (action.type) {
     case "CHANGE": {
       const { name, value } = action.payload;
-      const error = validators[name]
-        ? validators[name](value)
-        : "";
+      const error = validators[name] ? validators[name](value) : "";
 
       return {
         ...state,
@@ -66,6 +59,13 @@ function formReducer(state, action) {
       };
     }
 
+    case "SET_FORM":
+      return {
+        ...state,
+        values: action.payload,
+        errors: {},
+      };
+
     case "SET_ERRORS":
       return {
         ...state,
@@ -76,75 +76,98 @@ function formReducer(state, action) {
       return state;
   }
 }
-export default function CreateUser() {
+
+export default function CreateUser({open, onClose, editUser, onSuccess }) {
+  
   // const [errors, setErrors] = useState({
   //   username: "",
   // });
 
-  const [state, dispatch] = useReducer(
-  formReducer,
-  initialState
-);
+  const [state, dispatch] = useReducer(formReducer, initialState);
 
-const { values, errors } = state;
+  const { values, errors } = state;
 
-  
+  useEffect(() => {
+  if (editUser) {
+    dispatch({
+      type: "SET_FORM",
+      payload: {
+        username: editUser.username || "",
+        fullName: editUser.fullName || "",
+        sdt: editUser.sdt || "",
+        address: editUser.address || "",
+        email: editUser.email || "",
+        status: editUser.status || "ACTIVE",
+        role: editUser.role || "STAFF",
+        password: "",
+      },
+    });
+  } else {
+    dispatch({
+      type: "SET_FORM",
+      payload: initialState.values,
+    });
+  }
+}, [editUser]);
+
 
   const handleChange = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  dispatch({
-    type: "CHANGE",
-    payload: { name, value },
-  });
-};
+    dispatch({
+      type: "CHANGE",
+      payload: { name, value },
+    });
+  };
 
+  const validateForm = async () => {
+    const newErrors = {};
 
-const validateForm = async () => {
-  const newErrors = {};
+    for (const key in validators) {
+      const error = validators[key](values[key]);
+      if (error) newErrors[key] = error;
+    }
 
-  for (const key in validators) {
-    const error = validators[key](values[key]);
-    if (error) newErrors[key] = error;
-  }
-
-  if (Object.keys(newErrors).length > 0) {
-    dispatch({ type: "SET_ERRORS", payload: newErrors });
-    return false;
-  }
-
-  try {
-    const token =
-      localStorage.getItem("accessToken") ||
-      sessionStorage.getItem("accessToken");
-
-    const res = await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}/users`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    const exists = res.data.result.some(
-      (u) => u.username === values.username
-    );
-
-    if (exists) {
-      dispatch({
-        type: "SET_ERRORS",
-        payload: {
-          username: "Tên tài khoản đã tồn tại",
-        },
-      });
+    if (Object.keys(newErrors).length > 0) {
+      dispatch({ type: "SET_ERRORS", payload: newErrors });
       return false;
     }
 
-    return true;
-  } catch (err) {
-    console.error(err);
+    try {
+      const token =
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/users`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (!editUser) {
+  const exists = res.data.result.some(
+    (u) => u.username === values.username
+  );
+
+  if (exists) {
+    dispatch({
+      type: "SET_ERRORS",
+      payload: {
+        username: "Tên tài khoản đã tồn tại",
+      },
+    });
     return false;
   }
-};
+}
 
 
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
+    if (!open) return null;
 
   const handleSave = async () => {
   const isValid = await validateForm();
@@ -156,7 +179,9 @@ const validateForm = async () => {
     address: values.address.trim(),
     email: values.email.trim(),
     sdt: values.sdt.trim(),
-    password: values.password.trim(),
+    status: values.status,
+    role: values.role,
+    ...(values.password && { password: values.password.trim() }),
   };
 
   try {
@@ -164,18 +189,30 @@ const validateForm = async () => {
       localStorage.getItem("accessToken") ||
       sessionStorage.getItem("accessToken");
 
-    await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/users`,
-      user,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    if (editUser) {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/users/${editUser.id}`,
+        user,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Cập nhật user thành công");
+      onSuccess();   // 👈 reload data
+onClose();
+    } else {
+      // ➕ CREATE
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/users`,
+        user,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Thêm user thành công");
+    }
 
-    alert("Thêm user thành công");
+    onClose();
   } catch (err) {
     console.error(err);
   }
 };
-
 
 
   return (
@@ -188,8 +225,10 @@ const validateForm = async () => {
         <div className="modal-content rounded-3">
           {/* ===== HEADER ===== */}
           <div className="modal-header">
-            <h5 className="modal-title">Thêm mới nhân viên</h5>
-            <button className="btn-close"></button>
+            <h5 className="modal-title">
+  {editUser ? "Chỉnh sửa nhân viên" : "Thêm mới nhân viên"}
+</h5>
+            <button className="btn-close" onClick={onClose}></button>
           </div>
 
           {/* ===== BODY ===== */}
@@ -240,11 +279,10 @@ const validateForm = async () => {
                       />
                       {/* ❗ Thông báo lỗi (hidden nếu rỗng) */}
                       {errors.fullName && (
-  <div className="invalid-feedback">
-    {errors.fullName}
-  </div>
-)}
-
+                        <div className="invalid-feedback">
+                          {errors.fullName}
+                        </div>
+                      )}
                     </div>
 
                     <div className="col-md-6">
@@ -259,9 +297,7 @@ const validateForm = async () => {
                       />
                       {/* ❗ Thông báo lỗi (hidden nếu rỗng) */}
                       {errors.sdt && (
-                        <div className="invalid-feedback">
-                          {errors.sdt}
-                        </div>
+                        <div className="invalid-feedback">{errors.sdt}</div>
                       )}
                     </div>
 
@@ -277,9 +313,7 @@ const validateForm = async () => {
                       />
                       {/* ❗ Thông báo lỗi (hidden nếu rỗng) */}
                       {errors.address && (
-                        <div className="invalid-feedback">
-                          {errors.address}
-                        </div>
+                        <div className="invalid-feedback">{errors.address}</div>
                       )}
                     </div>
 
@@ -287,10 +321,16 @@ const validateForm = async () => {
                       <label className="form-label">Email</label>
                       <input
                         onChange={handleChange}
-                        className="form-control"
+                        className={`form-control ${
+                          errors.email ? "is-invalid" : ""
+                        }`}
                         value={values.email}
                         name="email"
                       />
+                      {/* ❗ Thông báo lỗi (hidden nếu rỗng) */}
+                      {errors.email && (
+                        <div className="invalid-feedback">{errors.email}</div>
+                      )}
                     </div>
 
                     <div className="col-md-6">

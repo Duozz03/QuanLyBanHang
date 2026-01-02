@@ -1,13 +1,18 @@
-// ShopDashboard.jsx
 import React, { useEffect, useState } from "react";
-
 import axios from "axios";
-import "./ListUser.css"; // giữ file CSS tuỳ chỉnh
+import "../Product/ShopDashboard.css";
+import CreateUser from "./CreateUser";
+import UserDetail from "./UserDetail";
 export default function ListUser() {
   const [user, setUser] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+    const [editUser, setEditUser] = useState(null);
+  
 
-  useEffect(() => {
+  const toggleRow = (id) => setExpandedId((p) => (p === id ? null : id));
+
+  
     const loadUser = async () => {
       try {
         const token =
@@ -27,9 +32,36 @@ export default function ListUser() {
         alert("Lỗi khi tải User");
       }
     };
-
+useEffect(() => {
     loadUser();
   }, []);
+
+  const handleDelete = async (user) => {
+    try{
+      const token =
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
+
+        await axios.delete(
+          `${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUser((prev) => prev.filter((p) => p.id !== user.id));
+    }catch(err){
+      console.err("Xóa thất bại:", err)
+    }
+  }
+
+  const openCreate = () => {
+    setEditUser(null);
+    setModalOpen(true);
+  };
+
+
+    const handleEdit = (user) => {
+    setEditUser(user);
+    setModalOpen(true);
+  };
 
   return (
     <div className="kv-app">
@@ -43,16 +75,13 @@ export default function ListUser() {
           {/* main table */}
           <div className="col-9 d-flex align-items-center justify-content-between kv-content-head">
             <div className="chip-search-wrapper">
-              <input
-                className="chip-input"
-                placeholder="Tìm nhân viên"
-                
-                
-              />
+              <input className="chip-input" placeholder="Tìm nhân viên" />
             </div>
 
             <div className="d-flex gap-2">
-              <button className="kv-btn ml-5">+ Nhân viên</button>
+              <button className="kv-btn ml-5" onClick={openCreate}>
+                + Nhân viên
+              </button>
             </div>
           </div>
         </div>
@@ -89,11 +118,11 @@ export default function ListUser() {
                     {user.map((r) => (
                       <React.Fragment key={r.id}>
                         <tr
-                        //   className={
-                        //     "kv-row" + (expandedId === r.id ? "expanded" : "")
-                        //   }
-                        //   onClick={() => toggleRow(r.id)}
-                        //   style={{ cursor: "pointer" }}
+                          className={
+                            "kv-row" + (expandedId === r.id ? "expanded" : "")
+                          }
+                          onClick={() => toggleRow(r.id)}
+                          style={{ cursor: "pointer" }}
                         >
                           <td>
                             <input
@@ -107,22 +136,26 @@ export default function ListUser() {
                           <td>{r.address}</td>
                           <td>{r.email}</td>
                           <td>{r.sdt}</td>
-                          <td>{r.status === "ACTIVE" ? "Đang Hoạt Động" : "Ngừng Hoạt Động" }</td>
+                          <td>
+                            {r.status === "ACTIVE"
+                              ? "Đang Hoạt Động"
+                              : "Ngừng Hoạt Động"}
+                          </td>
                           <td>{r.role}</td>
                           <td>{r.create_at}</td>
                         </tr>
 
-                        {/* {expandedId === r.id && (
-                                              <tr className="kv-detail-row">
-                                                <td colSpan={9}>
-                                                  <ProductDetail
-                                                    product={r}
-                                                    onEdit={handleEdit}
-                                                    onDelete={handleDelete}
-                                                  />
-                                                </td>
-                                              </tr>
-                                            )} */}
+                        {expandedId === r.id && (
+                          <tr className="kv-detail-row">
+                            <td colSpan={9}>
+                              <UserDetail
+                                user={r}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                              />
+                            </td>
+                          </tr>
+                        )}
                       </React.Fragment>
                     ))}
                   </tbody>
@@ -156,6 +189,15 @@ export default function ListUser() {
       </div>
 
       <div className="kv-footer">© 2025 Dauoz — Demo dashboard</div>
+      <CreateUser
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditUser(null);
+        }}
+        editUser={editUser}
+        onSuccess={loadUser}
+      />
     </div>
   );
 }

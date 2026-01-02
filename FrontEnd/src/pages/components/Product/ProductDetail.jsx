@@ -1,6 +1,6 @@
 // ProductDetail.jsx
 import React, { useEffect, useState } from "react";
-import "./ShopDashboard.css"; // dùng chung CSS (hoặc tạo file CSS riêng nếu muốn)
+import "./ShopDashboard.css"; 
 import axios from "axios";
 
 
