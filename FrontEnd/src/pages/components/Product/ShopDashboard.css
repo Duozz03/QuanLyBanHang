@@ -136,7 +136,7 @@
 .kv-input{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6e9ee; }
 
 /* content */
-.kv-content{ }
+
 .kv-content-head{ display:flex; align-items:center; margin-bottom:12px; gap:12px; }
 .kv-content-head h3{ margin:0; font-weight:700; }
 .kv-actions{ display:flex; gap:8px; align-items:center; }
@@ -155,8 +155,7 @@
   z-index: 5; }
 .kv-table tbody td{ padding:14px 12px;  vertical-align:middle; }
 .kv-row:hover td {
-  background-color: #a8adba;
-  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
 }
 .kv-avatar{ width:34px; height:34px; border-radius:6px; background:#eef2ff; display:flex; align-items:center; justify-content:center; }
 
@@ -180,10 +179,6 @@
   display:flex;
   gap:10px;
   align-items:center;
-}
-
-tbody:hover{
-  background: rgba(255,255,255,0.08);
 }
 
 /* style for nav items */
@@ -233,9 +228,20 @@ tbody:hover{
 
 
 /* row highlight / expanded */
-.kv-row { transition: background .12s; }
+.kv-row { transition: background-color 0.15s ease, box-shadow 0.15s ease; }
+.kv-row.expanded td{
+  background: rgba(59, 130, 246, 0.12) !important;
+  font-weight: 600;
+}
 
-.kv-row.expanded { box-shadow: inset 0 0 0 2px rgba(13,110,253,0.12); background: #f8fbff; }
+.kv-row.expanded td:first-child{
+  box-shadow: inset 3px 0 0 0 rgba(59, 130, 246, 0.9);
+}
+
+.kv-row.expanded { 
+  background: rgba(59, 130, 246, 0.12); /* xanh nhạt */
+  box-shadow: inset 3px 0 0 0 rgba(59, 130, 246, 0.9);
+}
 
 .kv-detail-row td { padding: 14px; background: #fff; border-bottom: 1px solid #eef2f6; }
 
@@ -424,7 +430,27 @@ thead{
   max-height: calc(100vh - 220px); /* trừ header + footer */
   overflow-y: auto;
 }
+.kv-table-scroll{
+  width: 100%;
+  max-height: 420px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.kv-table{
+  min-width: 1100px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
 
+.kv-table th,
+.kv-table td{
+  white-space: nowrap;
+}
+.kv-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
 .kv-table-wrap {
   padding: 0;
 }
@@ -434,4 +460,29 @@ thead{
   margin-right: 10px;
 }
 
+/* CSS TRẠNG THÁI NHÂN VIÊN */
+/* wrapper trạng thái */
+.kv-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+/* chấm tròn */
+.kv-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* đang hoạt động - xanh */
+.kv-status.active .kv-status-dot {
+  background-color: #22c55e; /* xanh */
+}
+
+/* ngừng hoạt động - đỏ */
+.kv-status.inactive .kv-status-dot {
+  background-color: #ef4444; /* đỏ */
+}
 

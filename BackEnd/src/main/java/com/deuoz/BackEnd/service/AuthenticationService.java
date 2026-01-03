@@ -30,7 +30,7 @@ import java.util.Date;
 @Slf4j
 
 public class AuthenticationService {
-    UserRepository userRepository;
+    final UserRepository userRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")

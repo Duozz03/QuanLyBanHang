@@ -30,9 +30,9 @@ import java.util.List;
 @Service
 public class InvoiceService {
 
-    InvoiceRepository invoiceRepository;
-    ProductRepository productRepository;
-    InvoiceMapper invoiceMapper;
+    final InvoiceRepository invoiceRepository;
+    final ProductRepository productRepository;
+    final InvoiceMapper invoiceMapper;
     @Transactional
     public InvoiceResponse createInvoice(InvoiceCreateRequest req) {
 

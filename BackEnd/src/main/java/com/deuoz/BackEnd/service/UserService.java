@@ -24,9 +24,9 @@ import java.util.List;
 @Slf4j
 
 public class UserService {
-    UserRepository userRepository;
-    UserMapper userMapper;
-    PasswordEncoder passwordEncoder;
+    final UserRepository userRepository;
+    final UserMapper userMapper;
+    final PasswordEncoder passwordEncoder;
     public UserResponse create(UserCreationRequest user){
         if(userRepository.existsByUsername(user.getUsername())){
             throw new AppException(ErrorCode.USER_ALREADY_EXISTS);

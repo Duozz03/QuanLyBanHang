@@ -6,6 +6,7 @@ import com.deuoz.BackEnd.dto.response.ApiResponse;
 import com.deuoz.BackEnd.dto.response.ProductResponse;
 import com.deuoz.BackEnd.entity.Product;
 import com.deuoz.BackEnd.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,10 +22,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal=true)
 @Slf4j
 public class ProductController {
-    private final ProductService productService;
+    final ProductService productService;
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ApiResponse<ProductResponse> addProduct(@RequestPart("product") ProductCreationRequest product,
-                                            @RequestPart("image") MultipartFile image) throws Exception{
+    ApiResponse<ProductResponse> addProduct(@Valid @RequestPart("product") ProductCreationRequest product,
+                                            @RequestPart(value = "image", required = false) MultipartFile image) throws Exception{
         return ApiResponse.<ProductResponse>builder()
                 .result(productService.createProduct(product,image))
                 .build();
@@ -35,9 +36,9 @@ public class ProductController {
                 .result(productService.getAllProducts())
                 .build();
     }
-    @PutMapping("/{productId}")
+    @PutMapping(value = "/{productId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ApiResponse<ProductResponse> updateProduct(
-            @PathVariable("productId") Long id,@RequestPart("product") ProductUpdateRequest request,
+            @PathVariable("productId") Long id,@Valid @RequestPart("product") ProductUpdateRequest request,
             @RequestPart(value ="image",required = false) MultipartFile image) throws Exception{
         return ApiResponse.<ProductResponse>builder()
                 .result(productService.updateProduct(id,request,image))
@@ -55,7 +56,11 @@ public class ProductController {
     public ApiResponse<byte[]> getProductImage(@PathVariable Long id) {
         Product product = productService.getProduct(id);
         byte[] imageData = product.getUrlImage();
-
+        if(imageData == null||imageData.length==0){
+            return ApiResponse.<byte[]>builder()
+                    .result(null)
+                    .build();
+        }
         return ApiResponse.<byte[]>builder()
                 .result(imageData)
                 .build();

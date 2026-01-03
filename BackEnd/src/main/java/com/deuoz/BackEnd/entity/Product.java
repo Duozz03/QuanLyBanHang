@@ -23,15 +23,19 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @Lob
-    @Column(columnDefinition = "LONGBLOB")
+    @Column(columnDefinition = "LONGBLOB", nullable = true)
     byte[] urlImage;
+    @Column(nullable = false,unique = true,length = 64)
     String barcode;
+    @Column(nullable = false, length = 255)
     String name;
-
     @Column(columnDefinition = "TEXT")
     String description;
+    @Column(nullable = false)
     double price;
+    @Column(nullable = false)
     double importPrice;
+    @Column(nullable = false)
     int quantity;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)

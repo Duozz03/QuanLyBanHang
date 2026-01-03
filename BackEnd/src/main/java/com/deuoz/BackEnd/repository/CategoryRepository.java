@@ -12,8 +12,14 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByParentIsNull();
-    boolean existsByName(String name);
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
+    boolean existsByNameIgnoreCase(String name);
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE Category c SET c.quantity = c.quantity + :delta WHERE c.id = :id")
-    int updateQuantity(@Param("id") Long id, @Param("delta") long quantity);
+    @Query("UPDATE Category c " +
+            "SET c.quantity = CASE " +
+            "  WHEN (c.quantity + :delta) < 0 THEN 0 " +
+            "  ELSE (c.quantity + :delta) " +
+            "END " +
+            "WHERE c.id = :id")
+    int updateQuantity(@Param("id") Long id, @Param("delta") long delta);
 }

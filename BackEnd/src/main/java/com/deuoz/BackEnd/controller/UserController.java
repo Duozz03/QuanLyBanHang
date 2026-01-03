@@ -19,7 +19,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
 public class UserController {
-    UserService userService;
+    final UserService userService;
     @PostMapping
     ApiResponse<UserResponse>create(@RequestBody UserCreationRequest request){
         return ApiResponse.<UserResponse>builder()
