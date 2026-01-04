@@ -409,7 +409,7 @@ export default function ShopDashboard() {
         </div>
       </div>
 
-      <div className="kv-footer">© 2025 Dauoz — Demo dashboard</div>
+      
 
       <CreateProductModal
         key={editProduct ? editProduct.id : "new"}

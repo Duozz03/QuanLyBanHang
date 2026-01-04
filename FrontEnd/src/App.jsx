@@ -7,6 +7,8 @@ import ListCategory from "./pages/components/Category/ListCategory";
 import ListUser from "./pages/components/User/ListUser";
 import UserDetail from "./pages/components/User/UserDetail";
 import { ToastContainer } from "react-toastify";
+import SaleHeaderLayout from "./layout/SaleHeaderLayout";
+import SalesLayout from "./pages/components/Sale/componentSale/SaleLayout";
 
 export default function App() {
   return (

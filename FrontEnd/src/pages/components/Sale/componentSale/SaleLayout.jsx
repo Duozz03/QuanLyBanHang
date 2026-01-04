@@ -4,6 +4,7 @@ import ProductGrid from "./SalesLayout/ProductInfor/ProductGrid";
 import SearchCustomerInput from "./SalesLayout/SearchCustomerInput";
 import "./SalesLayout/SalesLayout.css";
 import CartBox from "./SalesLayout/ProductSelectTion/CartBox";
+import { toast } from "react-toastify";
 
 export default function SalesLayout() {
 
@@ -146,7 +147,7 @@ export default function SalesLayout() {
         }
       );
 
-      alert("Thanh toán thành công!");
+      toast.success("Thanh toán thành công");
 
       // 🔄 reset hóa đơn
       setInvoices([
