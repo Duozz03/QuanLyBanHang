@@ -27,6 +27,7 @@ public class ApplicationInitConfig {
                 Status status = Status.ACTIVE;
                 User user = User.builder()
                         .username("admin")
+                        .fullName("Administrator")
                         .password(passwordEncoder.encode("admin"))
                         .status(status)
                         .role(roles)

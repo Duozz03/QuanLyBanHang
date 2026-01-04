@@ -4,6 +4,7 @@ import com.deuoz.BackEnd.dto.request.AuthenticationRequest;
 import com.deuoz.BackEnd.dto.response.ApiResponse;
 import com.deuoz.BackEnd.dto.response.AuthenticationResponse;
 import com.deuoz.BackEnd.service.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +21,7 @@ public class AuthenticationController {
     final AuthenticationService authenticationService;
 
     @PostMapping("/token")
-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request){
         var result = authenticationService.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)

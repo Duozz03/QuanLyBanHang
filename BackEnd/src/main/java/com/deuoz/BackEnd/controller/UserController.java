@@ -5,6 +5,7 @@ import com.deuoz.BackEnd.dto.request.UserRequest.UserUpdateRequest;
 import com.deuoz.BackEnd.dto.response.ApiResponse;
 import com.deuoz.BackEnd.dto.response.UserResponse;
 import com.deuoz.BackEnd.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,14 +22,14 @@ import java.util.List;
 public class UserController {
     final UserService userService;
     @PostMapping
-    ApiResponse<UserResponse>create(@RequestBody UserCreationRequest request){
+    ApiResponse<UserResponse>create(@RequestBody @Valid UserCreationRequest request){
         return ApiResponse.<UserResponse>builder()
                 .result(userService.create(request))
                 .build();
     }
     @PutMapping("/{userId}")
     ApiResponse<UserResponse> updateUser(@PathVariable("userId") Long userId,
-                                         @RequestBody UserUpdateRequest request){
+                                         @RequestBody @Valid UserUpdateRequest request){
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser(userId,request))
                 .build();
