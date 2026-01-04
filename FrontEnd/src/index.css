@@ -24,3 +24,46 @@ body,
 a {
   text-decoration: none;
 }
+.Toastify__toast-container {
+  z-index: 999999 !important;
+}
+/* toast chung */
+.Toastify__toast {
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+  font-size: 14px;
+  min-height: auto;
+}
+
+/* SUCCESS – giống Shopee / KiotViet */
+.Toastify__toast--success {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-left: 4px solid #22c55e; /* xanh lá */
+}
+
+/* ERROR */
+.Toastify__toast--error {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-left: 4px solid #ef4444; /* đỏ */
+}
+
+/* WARNING */
+.Toastify__toast--warning {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-left: 4px solid #f59e0b; /* vàng */
+}
+
+/* icon gọn lại */
+.Toastify__toast-icon {
+  width: 18px;
+}
+
+/* nút close */
+.Toastify__close-button {
+  color: #9ca3af;
+  opacity: 1;
+}

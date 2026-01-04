@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryCreationRequest {
-    @NotBlank
+    @NotBlank(message = "CATEGORY_NAME_NOT_BLANK")
     String name;
     Long parentId;
 }

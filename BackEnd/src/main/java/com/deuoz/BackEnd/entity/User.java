@@ -21,11 +21,16 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    @Column(nullable = false, unique = true, length = 50)
     String username;
+    @Column(nullable = false)
     String password;
+    @Column(nullable = false, length = 100)
     String fullName;
     String address;
+    @Column(unique = true, length = 100)
     String email;
+    @Column(length = 15)
     String sdt;
     LocalDateTime create_at;
     @Enumerated(EnumType.STRING)

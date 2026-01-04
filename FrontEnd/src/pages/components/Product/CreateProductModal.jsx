@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./CreateProductModal.css";
 import CreateCategoryModal from "../Category/CreateCategory";
+import { toast } from "react-toastify";
 
 export default function CreateProductModal({
   open,
@@ -89,15 +90,15 @@ export default function CreateProductModal({
     const stockNum = parseInt(form.quantity === "" ? "0" : form.quantity, 10);
 
     if (isNaN(importPriceNum) || importPriceNum < 0) {
-      alert("Import price phải là số >= 0.");
+      toast.warning("Giá vốn phải là số >= 0");
       return;
     }
     if (isNaN(salePriceNum) || salePriceNum < 0) {
-      alert("Sale price phải là số >= 0.");
+      toast.warning("Giá bán phải là số >= 0");
       return;
     }
     if (isNaN(stockNum) || stockNum < 0) {
-      alert("Stock quantity phải là số nguyên >= 0.");
+      toast.warning("Tồn kho phải là số nguyên >= 0");
       return;
     }
 
@@ -140,17 +141,32 @@ export default function CreateProductModal({
         res = await axios.post(baseUrl, formData, { headers });
       }
 
-      const savedProduct = res.data?.result ?? res.data; // phòng backend trả format khác
+      const savedProduct = res.data?.result ?? res.data;
       console.log("Kết quả từ backend:", res.data);
-
-      // Gọi lên cha để update state list => tự render
-      if (typeof onSave === "function") onSave(savedProduct, isEdit);
-
+      const uiProduct = {
+        ...savedProduct,
+        id: isEdit
+          ? initialProduct.id
+          : savedProduct.id ?? savedProduct.result?.id,
+        urlImage: selectedFile
+          ? previewUrl
+          : initialProduct?.urlImage ?? previewUrl ?? savedProduct.urlImage,
+      };
+      if (typeof onSave === "function") onSave(uiProduct, isEdit);
+      toast.success(
+        isEdit ? "Cập nhật hàng hóa thành công" : "Thêm hàng hóa thành công"
+      );
       // đóng modal sau khi lưu thành công
       if (typeof onClose === "function") onClose();
     } catch (err) {
       console.error("Lỗi khi gửi dữ liệu:", err);
-      alert("Gửi dữ liệu thất bại: " + (err?.message || "Unknown error"));
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Unknown error";
+
+      toast.error("Gửi dữ liệu thất bại: " + msg);
     }
   };
 

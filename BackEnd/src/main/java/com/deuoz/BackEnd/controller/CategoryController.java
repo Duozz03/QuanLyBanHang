@@ -21,7 +21,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
 public class CategoryController {
-    CategoryService categoryService;
+    final CategoryService categoryService;
     @PostMapping
     ApiResponse<CategoryResponse> create(@Valid @RequestBody CategoryCreationRequest category) {
         return ApiResponse.<CategoryResponse>builder()

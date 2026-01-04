@@ -30,5 +30,5 @@ public class Category {
     @JoinColumn(name = "parent_id")
     Category parent;
     @Column(nullable = false)
-    long quantity = 0;
+    long quantity=0;
 }

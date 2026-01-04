@@ -21,8 +21,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal=true)
 @Slf4j
 public class InvoiceController {
-    InvoiceService invoiceService;
-    InvoiceMapper invoiceMapper;
+    final InvoiceService invoiceService;
+    final InvoiceMapper invoiceMapper;
     @PostMapping
     public ApiResponse<InvoiceResponse> createInvoice(@Valid @RequestBody InvoiceCreateRequest req) {
         return ApiResponse.<InvoiceResponse>builder()

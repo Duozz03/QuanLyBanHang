@@ -27,9 +27,9 @@ import java.time.LocalDateTime;
 @Service
 public class PaymentService {
 
-    PaymentRepository paymentRepository;
-    InvoiceRepository invoiceRepository;
-    PaymentMapper paymentMapper;
+    final PaymentRepository paymentRepository;
+    final InvoiceRepository invoiceRepository;
+    final PaymentMapper paymentMapper;
 
 
     @Transactional

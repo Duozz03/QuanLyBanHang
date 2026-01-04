@@ -7,58 +7,55 @@ export default function ListUser() {
   const [user, setUser] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
-    const [editUser, setEditUser] = useState(null);
-  
+  const [editUser, setEditUser] = useState(null);
 
   const toggleRow = (id) => setExpandedId((p) => (p === id ? null : id));
 
-  
-    const loadUser = async () => {
-      try {
-        const token =
-          localStorage.getItem("accessToken") ||
-          sessionStorage.getItem("accessToken");
-
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/users`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const data = res.data.result || [];
-        console.log("data", data);
-
-        setUser(data);
-      } catch (err) {
-        console.error(err);
-        alert("Lỗi khi tải User");
-      }
-    };
-useEffect(() => {
-    loadUser();
-  }, []);
-
-  const handleDelete = async (user) => {
-    try{
+  const loadUser = async () => {
+    try {
       const token =
         localStorage.getItem("accessToken") ||
         sessionStorage.getItem("accessToken");
 
-        await axios.delete(
-          `${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`,
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/users`,
         { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setUser((prev) => prev.filter((p) => p.id !== user.id));
-    }catch(err){
-      console.err("Xóa thất bại:", err)
+      );
+      const data = res.data.result || [];
+      console.log("data", data);
+
+      setUser(data);
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi tải User");
     }
-  }
+  };
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const handleDelete = async (user) => {
+    try {
+      const token =
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
+
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUser((prev) => prev.filter((p) => p.id !== user.id));
+    } catch (err) {
+      console.err("Xóa thất bại:", err);
+    }
+  };
 
   const openCreate = () => {
     setEditUser(null);
     setModalOpen(true);
   };
 
-
-    const handleEdit = (user) => {
+  const handleEdit = (user) => {
     setEditUser(user);
     setModalOpen(true);
   };
@@ -97,7 +94,7 @@ useEffect(() => {
 
           <div className="col-12 col-lg-9">
             <div className="kv-table-container">
-              <div className="kv-table-wrap">
+              <div className="kv-table-scroll">
                 <table className="table kv-table mb-0">
                   <thead>
                     <tr>
@@ -119,7 +116,7 @@ useEffect(() => {
                       <React.Fragment key={r.id}>
                         <tr
                           className={
-                            "kv-row" + (expandedId === r.id ? "expanded" : "")
+                            "kv-row" + (expandedId === r.id ? " expanded" : "")
                           }
                           onClick={() => toggleRow(r.id)}
                           style={{ cursor: "pointer" }}
@@ -137,9 +134,17 @@ useEffect(() => {
                           <td>{r.email}</td>
                           <td>{r.sdt}</td>
                           <td>
-                            {r.status === "ACTIVE"
-                              ? "Đang Hoạt Động"
-                              : "Ngừng Hoạt Động"}
+                            <span
+                              className={
+                                "kv-status " +
+                                (r.status === "ACTIVE" ? "active" : "inactive")
+                              }
+                            >
+                              <span className="kv-status-dot" />
+                              {r.status === "ACTIVE"
+                                ? "Đang hoạt động"
+                                : "Ngừng hoạt động"}
+                            </span>
                           </td>
                           <td>{r.role}</td>
                           <td>{r.create_at}</td>

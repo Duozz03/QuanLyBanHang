@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal=true)
 @Slf4j
 public class PaymentController {
-    private final PaymentService paymentService;
+    final PaymentService paymentService;
     @PostMapping("/invoice/{invoiceId}")
     public PaymentResponse create(@PathVariable Long invoiceId,
                                   @RequestBody PaymentCreationRequest req) {

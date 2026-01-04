@@ -24,12 +24,15 @@ import java.util.List;
 @Slf4j
 
 public class UserService {
-    UserRepository userRepository;
-    UserMapper userMapper;
-    PasswordEncoder passwordEncoder;
+    final UserRepository userRepository;
+    final UserMapper userMapper;
+    final PasswordEncoder passwordEncoder;
     public UserResponse create(UserCreationRequest user){
         if(userRepository.existsByUsername(user.getUsername())){
             throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
+        }
+        if(user.getEmail() != null && userRepository.existsByEmail(user.getEmail())){
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         User newUser = userMapper.toUser(user);
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -38,6 +41,13 @@ public class UserService {
     public UserResponse updateUser(Long id, UserUpdateRequest request){
         User user = userRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+        String email = request.getEmail();
+        if(request.getEmail() != null){
+            email = email.trim();
+        }
+        if(request.getEmail() != null && userRepository.existsByEmailAndIdNot(email,id)){
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
         userMapper.updateUser(user,request);
         return userMapper.toUserResponse(userRepository.save(user));
     }

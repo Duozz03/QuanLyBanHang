@@ -1,9 +1,10 @@
 // ShopDashboard.jsx
 import React, { useEffect, useState } from "react";
-import "./ShopDashboard.css"; // giữ file CSS tuỳ chỉnh
+import "./ShopDashboard.css";
 import ProductDetail from "./ProductDetail";
 import CreateProductModal from "./CreateProductModal";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function ShopDashboard() {
   const [expandedId, setExpandedId] = useState(null);
@@ -11,14 +12,31 @@ export default function ShopDashboard() {
   const [editProduct, setEditProduct] = useState(null);
   const [products, setProducts] = useState([]);
 
-  //search dropdown
+  // search dropdown
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]); // id đã thêm vào bảng tìm kiếm
 
+  // phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // ====== DERIVED (phải đặt trước các useEffect clamp) ======
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+
+  const displayProducts =
+    selectedIds.length === 0
+      ? products
+      : products.filter((p) => selectedIds.includes(p.id));
+
+  const totalItems = displayProducts.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const paginatedProducts = displayProducts.slice(startIndex, endIndex);
+
+  // ====== EFFECT: search dropdown ======
   useEffect(() => {
     const keyword = searchTerm.trim().toLowerCase();
-
     if (!keyword) {
       setSearchResults([]);
       return;
@@ -30,30 +48,12 @@ export default function ShopDashboard() {
           p.name?.toLowerCase().includes(keyword) ||
           p.barcode?.toString().includes(keyword)
       )
-      .slice(0, 8); // giới hạn 8 dòng giống KiotViet
+      .slice(0, 8);
 
     setSearchResults(results);
   }, [searchTerm, products]);
 
-  const handleSelectProduct = (product) => {
-    if (selectedIds.includes(product.id)) return; // 🚫 không thêm trùng
-
-    setSelectedIds((prev) => [...prev, product.id]);
-
-    setSearchTerm("");
-    setSearchResults([]);
-  };
-  const removeSelected = (id) => {
-    setSelectedIds((prev) => prev.filter((x) => x !== id));
-  };
-
-  //Phân trang
-  const [currentPage, setCurrentPage] = useState(1); // reset về trang ban đầu
-  const [pageSize, setPageSize] = useState(10); // số sản phẩm / trang
-
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-
+  // ====== EFFECT: load products ======
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -96,6 +96,27 @@ export default function ShopDashboard() {
     loadProducts();
   }, []);
 
+  // ====== EFFECT: clamp currentPage khi filter/xóa làm totalPages giảm ======
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  // ====== handlers ======
+  const handleSelectProduct = (product) => {
+    if (selectedIds.includes(product.id)) return;
+    setSelectedIds((prev) => [...prev, product.id]);
+    setSearchTerm("");
+    setSearchResults([]);
+    setCurrentPage(1); // chọn filter -> về trang 1 cho dễ hiểu
+  };
+
+  const removeSelected = (id) => {
+    setSelectedIds((prev) => prev.filter((x) => x !== id));
+    setCurrentPage(1);
+  };
+
   const toggleRow = (id) => setExpandedId((p) => (p === id ? null : id));
 
   const openCreate = () => {
@@ -110,8 +131,7 @@ export default function ShopDashboard() {
 
   const handleSave = (product, isEdit) => {
     if (!product) return;
-
-    // Chuẩn hoá dữ liệu đầu vào từ backend
+    const prevProduct = products.find((p) => String(p.id) === String(product.id));
     const normalized = {
       ...product,
       id: String(product.id),
@@ -123,35 +143,25 @@ export default function ShopDashboard() {
       quantity: Number(product.quantity) || 0,
       status: product.status || "ACTIVE",
       categoryId: product.categoryId || "",
-      // FIX: Date object không slice được
-      createdAt: product.createdAt || new Date().toISOString().slice(0, 10), // YYYY-MM-DD
-      // ảnh: nếu backend chưa trả urlImage thì dùng placeholder
-      urlImage: product.urlImage || "/images/product-placeholder.png",
+      createdAt: product.createdAt || prevProduct?.createdAt || new Date().toISOString().slice(0, 10),
+      urlImage: product.urlImage ?? prevProduct?.urlImage ??  "/images/product-placeholder.png",
     };
 
     if (isEdit) {
       setProducts((prev) =>
         prev.map((p) =>
           String(p.id) === String(normalized.id)
-            ? {
-                ...p,
-                ...normalized,
-                // nếu backend không trả urlImage, giữ urlImage cũ
-                urlImage: normalized.urlImage || p.urlImage,
-              }
+            ? { ...p, ...normalized, urlImage: normalized.urlImage || p.urlImage }
             : p
         )
       );
-
       setModalOpen(false);
       setExpandedId(normalized.id);
       setEditProduct(null);
       return;
     }
 
-    // CREATE
     setProducts((prev) => {
-      // tránh trùng id (hiếm khi xảy ra nếu backend sinh id chuẩn)
       const exists = prev.some((p) => String(p.id) === String(normalized.id));
       const finalProduct = exists
         ? { ...normalized, id: `${normalized.id}-${Date.now()}` }
@@ -169,36 +179,36 @@ export default function ShopDashboard() {
       const token =
         localStorage.getItem("accessToken") ||
         sessionStorage.getItem("accessToken");
-      // gọi API xóa trên backend bằng axios
+
       await axios.delete(
         `${import.meta.env.VITE_API_BASE_URL}/products/${product.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // cập nhật lại state frontend
       setProducts((prev) => prev.filter((p) => p.id !== product.id));
+      if (expandedId === product.id) setExpandedId(null);
+      toast.success("Xóa thành công");
     } catch (err) {
       console.error("Xóa thất bại:", err);
     }
   };
-  const displayProducts =
-    selectedIds.length === 0
-      ? products // 👉 chưa chọn gì → hiện tất cả
-      : products.filter((p) => selectedIds.includes(p.id));
 
-  const paginatedProducts = displayProducts.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(displayProducts.length / pageSize);
+  // ====== render helpers ======
+  const pagingText = (() => {
+    if (totalItems === 0) return "0 - 0 trong 0 hàng hóa";
+    const from = startIndex + 1;
+    const to = Math.min(endIndex, totalItems);
+    return `${from} - ${to} trong ${totalItems} hàng hóa`;
+  })();
 
   return (
     <div className="kv-app">
-      {/* main: use bootstrap container + kv-main grid fallback */}
       <div className="container-fluid">
         <div className="row bm-3" style={{ margin: "0px 100px 0px 100px" }}>
           <h5 className="col-3 kv-heading-page">
             <span>Hàng Hóa</span>
           </h5>
 
-          {/* main table */}
           <div className="col-9 d-flex align-items-center justify-content-between kv-content-head">
             <div className="chip-search-wrapper">
               {selectedIds.map((id) => {
@@ -250,7 +260,6 @@ export default function ShopDashboard() {
         </div>
 
         <div className="row gx-4" style={{ margin: "0 100px" }}>
-          {/* ⬅ Sidebar */}
           <aside className="col-12 col-lg-3">
             <div className="kv-panel">
               <h4 className="kv-panel-title">Bộ lọc</h4>
@@ -282,7 +291,7 @@ export default function ShopDashboard() {
                       <React.Fragment key={r.id}>
                         <tr
                           className={
-                            "kv-row" + (expandedId === r.id ? "expanded" : "")
+                            "kv-row" + (expandedId === r.id ? " expanded" : "")
                           }
                           onClick={() => toggleRow(r.id)}
                           style={{ cursor: "pointer" }}
@@ -332,7 +341,7 @@ export default function ShopDashboard() {
                       </React.Fragment>
                     ))}
 
-                    {products.length === 0 && (
+                    {totalItems === 0 && (
                       <tr>
                         <td colSpan={9} className="text-center p-4 muted">
                           Không có sản phẩm
@@ -342,60 +351,59 @@ export default function ShopDashboard() {
                   </tbody>
                 </table>
               </div>
-              <div className="pagination-bar">
-                <div className="left">
-                  <span>Hiển thị</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value));
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={15}>15</option>
-                    <option value={20}>20</option>
-                  </select>
-                  <span>dòng</span>
-                </div>
+            </div>
 
-                <div className="center">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(1)}
-                  >
-                    ⏮
-                  </button>
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    ◀
-                  </button>
-
-                  <span className="page-number">{currentPage}</span>
-
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    ▶
-                  </button>
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(totalPages)}
-                  >
-                    ⏭
-                  </button>
-                </div>
-
-                <div className="right">
-                  {`${(currentPage - 1) * pageSize + 1}
-      - ${Math.min(currentPage * pageSize, 10)}
-      trong ${10} hàng hóa`}
-                </div>
+            <div className="pagination-bar">
+              <div className="left">
+                <span>Hiển thị</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={15}>15</option>
+                  <option value={20}>20</option>
+                </select>
+                <span>dòng</span>
               </div>
+
+              <div className="center">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(1)}
+                >
+                  ⏮
+                </button>
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
+                  ◀
+                </button>
+
+                <span className="page-number">{currentPage}</span>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                >
+                  ▶
+                </button>
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  ⏭
+                </button>
+              </div>
+
+              <div className="right">{pagingText}</div>
             </div>
           </div>
         </div>
@@ -403,7 +411,6 @@ export default function ShopDashboard() {
 
       <div className="kv-footer">© 2025 Dauoz — Demo dashboard</div>
 
-      {/* CreateProductModal (giữ component hiện tại) */}
       <CreateProductModal
         key={editProduct ? editProduct.id : "new"}
         open={modalOpen}
