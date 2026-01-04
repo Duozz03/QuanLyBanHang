@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "./Header.css";
 
 export default function Header() {
@@ -84,7 +84,7 @@ export default function Header() {
               </div>
           </nav>
 
-          <button className="kv-pill">Bán hàng</button>
+          <NavLink to="/sales" className="kv-pill" style={{ textDecoration: "none" }} >Bán hàng</NavLink>
         </div>
       </header>
     </>

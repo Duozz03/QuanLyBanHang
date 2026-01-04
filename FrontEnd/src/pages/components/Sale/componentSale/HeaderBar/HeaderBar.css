@@ -1,0 +1,128 @@
+.header-bar{
+    display: flex;
+    background-color: blue;
+    align-items: center;
+}
+
+
+.tab-item{
+    display: flex;
+    align-items: center;
+}
+
+.OnlyManeger{
+     margin-left: auto;
+}
+
+input {
+  border-radius: 999px;
+}
+.search-produce-input{
+    border-radius: 998px;
+}
+.invoice-tabs {
+  display: flex;
+  align-items: flex-end;
+  background: blue;              /* nền xanh */
+  padding: 6px 6px 0;
+ /* đường viền dưới */
+}
+
+/* ===== TAB CHUNG ===== */
+.tab-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 14px;
+  margin-right: 6px;
+
+  color: #e5e7eb;
+  cursor: pointer;
+
+  border-radius: 6px 6px 0 0;
+  user-select: none;
+}
+
+/* ===== TAB ACTIVE ===== */
+.tab-item.active {
+  background: #f2f3f5;
+  color: #111827;
+  font-weight: 600;
+  z-index: 2; /* 🔥 đè lên các tab khác */
+}
+
+
+/* 🔥 MẤU CHỐT: tạo nền trắng nối xuống */
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;      /* đè lên border-bottom */
+  height: 4px;       /* độ “nối xuống” */
+  background: #f2f3f5;
+}
+
+/* ===== TITLE ===== */
+.tab-title {
+  white-space: nowrap;
+}
+
+/* ===== NÚT ĐÓNG ===== */
+.tab-close {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* ===== NÚT + ===== */
+.tab-add {
+  height: 32px;
+  width: 32px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #2563eb;
+  color: #fff;
+}
+
+/*Button maneger*/
+.btn-gradient {
+  padding: 10px 50px;
+  border: none;
+  outline: none;
+
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  border-radius: 999px; /* 🔥 pill shape */
+
+  background: linear-gradient(
+    90deg,
+    #ff6a88,
+    #ff8c6b
+  );
+
+  box-shadow:
+    0 6px 16px rgba(255, 106, 136, 0.45);
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 24px rgba(255, 106, 136, 0.6);
+}
+.btn-gradient:active {
+  transform: translateY(0);
+  box-shadow:
+    0 6px 14px rgba(255, 106, 136, 0.4);
+}
